@@ -1,11 +1,56 @@
 @using BlazorBootstrap
+
 <Modal @ref="modal">
     <HeaderTemplate>
+        <div>
+            <h5 class="modal-title mb-1">Create your account</h5>
+            <p class="text-muted small mb-0">Start building better workflows with Joby.</p>
+        </div>
     </HeaderTemplate>
+
     <BodyTemplate>
+        <EditForm Model="signupModel" OnValidSubmit="HandleSubmit" FormName="signup-form">
+            <DataAnnotationsValidator />
 
+            <div class="row g-3">
+                <div class="col-12 col-sm-6">
+                    <label for="signup-first-name" class="form-label">First Name</label>
+                    <InputText id="signup-first-name" class="form-control" autocomplete="given-name" @bind-Value="signupModel.FirstName" />
+                    <ValidationMessage For="@(() => signupModel.FirstName)" />
+                </div>
+
+                <div class="col-12 col-sm-6">
+                    <label for="signup-last-name" class="form-label">Last Name</label>
+                    <InputText id="signup-last-name" class="form-control" autocomplete="family-name" @bind-Value="signupModel.LastName" />
+                    <ValidationMessage For="@(() => signupModel.LastName)" />
+                </div>
+
+                <div class="col-12">
+                    <label for="signup-email" class="form-label">Email</label>
+                    <InputText id="signup-email" class="form-control" type="email" autocomplete="email" @bind-Value="signupModel.Email" />
+                    <ValidationMessage For="@(() => signupModel.Email)" />
+                </div>
+
+                <div class="col-12 col-sm-6">
+                    <label for="signup-password" class="form-label">Password</label>
+                    <InputText id="signup-password" class="form-control" type="password" autocomplete="new-password" @bind-Value="signupModel.Password" />
+                    <ValidationMessage For="@(() => signupModel.Password)" />
+                </div>
+
+                <div class="col-12 col-sm-6">
+                    <label for="signup-confirm-password" class="form-label">Confirm Password</label>
+                    <InputText id="signup-confirm-password" class="form-control" type="password" autocomplete="new-password" @bind-Value="signupModel.ConfirmPassword" />
+                    <ValidationMessage For="@(() => signupModel.ConfirmPassword)" />
+                </div>
+            </div>
+
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-primary signup-modal-submit">Sign Up</button>
+            </div>
+        </EditForm>
     </BodyTemplate>
-    <FooterTemplate>
 
+    <FooterTemplate>
+        <button type="button" class="btn btn-link text-decoration-none" @onclick="CloseModal">Close</button>
     </FooterTemplate>
 </Modal>
