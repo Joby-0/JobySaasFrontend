@@ -1,0 +1,61 @@
+﻿@inject NavigationManager NavigationManager
+
+
+<div class="container header-container">
+    <header class="d-flex align-items-center justify-content-between site-header">
+
+        <div class="logo">
+            <NavLink href="/" class="text-decoration-none">
+                <span>JOBY</span>
+            </NavLink>
+        </div>
+
+        <nav class="d-flex align-items-center gap-4">
+
+            <div class="dropdown">
+
+                <button class="btn p-0 border-0 bg-transparent dropdown-toggle nav-link" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    Tools
+                </button>
+
+                <div class="dropdown-menu tools-dropdown">
+                    <!-- Blank for now -->
+                </div>
+
+            </div>
+
+            <NavLink href="/about" class="text-decoration-none ">
+                <span class="nav-link">About</span>
+            </NavLink>
+
+            <NavLink href="/pricing" class="text-decoration-none nav-link">
+                <span class="nav-link">Pricing</span>
+            </NavLink>
+
+            <AuthorizeView>
+                <Authorized>
+                    <NavLink href="/dashboard" class="text-decoration-none nav-link">
+                        <span class="nav-link">Dashboard</span>
+                    </NavLink>
+
+                    <NavLink href="/account" class="text-decoration-none nav-link">
+                        <span class="nav-link">Account</span>
+                    </NavLink>
+                </Authorized>
+
+                <NotAuthorized>
+                    <NavLink href="/login" class="text-decoration-none nav-link">
+                        <span class="nav-link">Sign in</span>
+                    </NavLink>
+
+                    <NavLink href="/register" class=" ">
+                        <button class="btn btn-primary signup-button">Sign up</button>
+                    </NavLink>
+                </NotAuthorized>
+            </AuthorizeView>
+
+        </nav>
+
+    </header>
+</div>
