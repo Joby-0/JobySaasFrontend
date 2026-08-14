@@ -1,4 +1,5 @@
-﻿@inject NavigationManager NavigationManager
+﻿@using JobySaasFrontend.Components.Components
+@inject NavigationManager NavigationManager
 
 
 <div class="container header-container">
@@ -14,14 +15,14 @@
 
             <div class="tools-wrapper">
 
-                    <div class="tools-trigger">
-                        <span class="nav-link">Tools</span>
-                        <span class="tools-arrow" aria-hidden="true"></span>
-                    </div>
+                <div class="tools-trigger">
+                    <span class="nav-link">Tools</span>
+                    <span class="tools-arrow" aria-hidden="true"></span>
+                </div>
 
-                    <div class="tools-dropdown rounded-3">
-                        <!-- Add tool links or content here -->
-                    </div>
+                <div class="tools-dropdown rounded-3">
+                    <!-- Add tool links or content here -->
+                </div>
 
             </div>
 
@@ -49,9 +50,9 @@
                         <span class="nav-link">Sign in</span>
                     </NavLink>
 
-                    <NavLink href="/register" class=" ">
-                        <button class="btn btn-primary signup-button">Sign up</button>
-                    </NavLink>
+                    <button class="btn btn-primary signup-button" @onclick="OpenRegisterModal">Sign up</button>
+                    <SignUpModal @ref="signUpModal"/>
+
                 </NotAuthorized>
             </AuthorizeView>
 
