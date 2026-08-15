@@ -10,6 +10,8 @@ using Microsoft.Extensions.Primitives;
 using JobySaasFrontend.Components.Account.Pages;
 using JobySaasFrontend.Components.Account.Pages.Manage;
 using JobySaasFrontend.Data;
+using JobySaasFrontend.Models.DTO;
+using JobySaasFrontend.Services;
 
 namespace Microsoft.AspNetCore.Routing;
 
@@ -21,6 +23,20 @@ internal static class IdentityComponentsEndpointRouteBuilderExtensions
         ArgumentNullException.ThrowIfNull(endpoints);
 
         var accountGroup = endpoints.MapGroup("/Account");
+
+        accountGroup.MapPost("/Register", async (
+            HttpRequest request,
+            RegisterRequest registerRequest,
+            [FromServices] IAuthService authService) =>
+        {
+            var confirmationUrl = $"{request.Scheme}://{request.Host}{request.PathBase}/Account/ConfirmEmail";
+            var response = await authService.RegisterAsync(registerRequest, confirmationUrl);
+            return response.Succeeded
+                ? Results.Ok(response)
+                : Results.ValidationProblem(response.Errors
+                    .GroupBy(error => "Register")
+                    .ToDictionary(group => group.Key, group => group.ToArray()));
+        });
 
         accountGroup.MapPost("/PerformExternalLogin", (
             HttpContext context,

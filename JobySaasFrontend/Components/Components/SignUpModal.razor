@@ -11,6 +11,11 @@
         <EditForm Model="signupModel" OnValidSubmit="HandleSubmit" FormName="signup-form">
             <DataAnnotationsValidator />
 
+            @if (errorMessage is not null)
+            {
+                <div class="alert alert-danger" role="alert">@errorMessage</div>
+            }
+
             <div class="row g-3 signup-form p-2">
                 <div class="col-md-12 form-floating">
                     <InputText id="signup-first-name" class="form-control" placeholder="First Name" autocomplete="given-name" @bind-Value="signupModel.FirstName" />
@@ -54,7 +59,9 @@
             </div>
 
             <div class="d-grid mt-4">
-                <button type="submit" class="btn btn-primary signup-modal-submit">Sign Up</button>
+                <button type="submit" class="btn btn-primary signup-modal-submit" disabled="@isSubmitting">
+                    @(isSubmitting ? "Creating account..." : "Sign Up")
+                </button>
             </div>
         </EditForm>
     </BodyTemplate>

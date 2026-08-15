@@ -4,5 +4,5 @@ namespace JobySaasFrontend.Services;
 
 public interface IAuthService
 {
-    public Task<RegisterResponse> RegisterAsync(RegisterRequest request);
+    Task<RegisterResponse> RegisterAsync(RegisterRequest request, string confirmationUrl);
 }

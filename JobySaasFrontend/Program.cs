@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using JobySaasFrontend.Components;
 using JobySaasFrontend.Components.Account;
 using JobySaasFrontend.Data;
+using JobySaasFrontend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddBlazorBootstrap();
 

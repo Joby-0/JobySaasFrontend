@@ -1,12 +1,23 @@
 using System.ComponentModel.DataAnnotations;
 using BlazorBootstrap;
+using JobySaasFrontend.Models.DTO;
+using JobySaasFrontend.Services;
+using Microsoft.AspNetCore.Components;
 
 namespace JobySaasFrontend.Components.Components;
 
 public partial class SignUpModal
 {
+    [Inject]
+    private IAuthService AuthService { get; set; } = default!;
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
     private Modal? modal;
     private readonly SignupModel signupModel = new();
+    private string? errorMessage;
+    private bool isSubmitting;
 
     public async Task OpenModal()
     {
@@ -24,10 +35,36 @@ public partial class SignUpModal
         }
     }
 
-    private Task HandleSubmit()
+    private async Task HandleSubmit()
     {
-        // Placeholder: connect the validated model to the signup service later.
-        return Task.CompletedTask;
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+            var confirmationUrl = NavigationManager.ToAbsoluteUri("Account/ConfirmEmail").AbsoluteUri;
+            var response = await AuthService.RegisterAsync(new RegisterRequest
+            {
+                FirstName = signupModel.FirstName,
+                LastName = signupModel.LastName,
+                Email = signupModel.Email,
+                Password = signupModel.Password,
+                ConfirmPassword = signupModel.ConfirmPassword
+            }, confirmationUrl);
+
+            if (!response.Succeeded)
+            {
+                errorMessage = string.Join(" ", response.Errors);
+                return;
+            }
+
+            await CloseModal();
+            NavigationManager.NavigateTo($"Account/RegisterConfirmation?email={Uri.EscapeDataString(signupModel.Email)}");
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
     }
 
     private sealed class SignupModel
