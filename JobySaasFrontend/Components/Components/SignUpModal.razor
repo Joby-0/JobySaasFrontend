@@ -4,7 +4,6 @@
     <HeaderTemplate>
         <div>
             <h5 class="modal-title mb-1">Create your account</h5>
-            <p class="text-muted small mb-0">Start building better workflows with Joby.</p>
         </div>
     </HeaderTemplate>
 
@@ -12,35 +11,45 @@
         <EditForm Model="signupModel" OnValidSubmit="HandleSubmit" FormName="signup-form">
             <DataAnnotationsValidator />
 
-            <div class="row g-3">
-                <div class="col-12 col-sm-6">
-                    <label for="signup-first-name" class="form-label">First Name</label>
-                    <InputText id="signup-first-name" class="form-control" autocomplete="given-name" @bind-Value="signupModel.FirstName" />
-                    <ValidationMessage For="@(() => signupModel.FirstName)" />
+            <div class="row g-3 signup-form p-2">
+                <div class="col-md-12 form-floating">
+                    <InputText id="signup-first-name" class="form-control" placeholder="First Name" autocomplete="given-name" @bind-Value="signupModel.FirstName" />
+
+                    <label for="signup-first-name" >First Name</label>
+
+                    <ValidationMessage For="@(() => signupModel.FirstName)" class="invalid-feedback d-block ps-1"/>
                 </div>
 
-                <div class="col-12 col-sm-6">
-                    <label for="signup-last-name" class="form-label">Last Name</label>
-                    <InputText id="signup-last-name" class="form-control" autocomplete="family-name" @bind-Value="signupModel.LastName" />
-                    <ValidationMessage For="@(() => signupModel.LastName)" />
+                <div class="col-md-12 form-floating">
+                    <InputText id="signup-last-name" class="form-control" placeholder="Last Name" autocomplete="family-name" @bind-Value="signupModel.LastName" />
+
+                    <label for="signup-last-name">Last Name</label>
+
+                    <ValidationMessage For="@(() => signupModel.LastName)" class="invalid-feedback d-block ps-1"/>
                 </div>
 
-                <div class="col-12">
-                    <label for="signup-email" class="form-label">Email</label>
-                    <InputText id="signup-email" class="form-control" type="email" autocomplete="email" @bind-Value="signupModel.Email" />
-                    <ValidationMessage For="@(() => signupModel.Email)" />
+                <div class="col-12 form-floating">
+                    <InputText id="signup-email" class="form-control" type="email" placeholder="Email" autocomplete="email" @bind-Value="signupModel.Email" />
+
+                    <label for="signup-email">Email</label>
+
+                    <ValidationMessage For="@(() => signupModel.Email)" class="invalid-feedback d-block ps-1"/>
                 </div>
 
-                <div class="col-12 col-sm-6">
-                    <label for="signup-password" class="form-label">Password</label>
-                    <InputText id="signup-password" class="form-control" type="password" autocomplete="new-password" @bind-Value="signupModel.Password" />
-                    <ValidationMessage For="@(() => signupModel.Password)" />
+                <div class="col-md-12 form-floating">
+                    <InputText id="signup-password" class="form-control" type="password" placeholder="Password" autocomplete="new-password" @bind-Value="signupModel.Password" />
+
+                    <label for="signup-password">Password</label>
+
+                    <ValidationMessage For="@(() => signupModel.Password)" class="invalid-feedback d-block ps-1"/>
                 </div>
 
-                <div class="col-12 col-sm-6">
-                    <label for="signup-confirm-password" class="form-label">Confirm Password</label>
-                    <InputText id="signup-confirm-password" class="form-control" type="password" autocomplete="new-password" @bind-Value="signupModel.ConfirmPassword" />
-                    <ValidationMessage For="@(() => signupModel.ConfirmPassword)" />
+                <div class="col-md-12 form-floating">
+                    <InputText id="signup-confirm-password" class="form-control" type="password" placeholder="Confirm Password" autocomplete="new-password" @bind-Value="signupModel.ConfirmPassword" />
+
+                    <label for="signup-confirm-password">Confirm Password</label>
+
+                    <ValidationMessage For="@(() => signupModel.ConfirmPassword)" class="invalid-feedback d-block ps-1" />
                 </div>
             </div>
 
