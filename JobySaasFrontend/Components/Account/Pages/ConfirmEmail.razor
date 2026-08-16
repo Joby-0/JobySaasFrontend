@@ -1,49 +1,57 @@
-﻿@page "/Account/ConfirmEmail"
+@page "/account/confirm-email"
 
-@using System.Text
-@using Microsoft.AspNetCore.Identity
-@using Microsoft.AspNetCore.WebUtilities
-@using JobySaasFrontend.Data
+@using JobySaasFrontend.Services
+@inject IAuthApiClient AuthApiClient
+@inject NavigationManager NavigationManager
 
-@inject UserManager<ApplicationUser> UserManager
-@inject IdentityRedirectManager RedirectManager
+<PageTitle>Email confirmation</PageTitle>
 
-<PageTitle>Confirm email</PageTitle>
-
-<h1>Confirm email</h1>
-<StatusMessage Message="@statusMessage" />
+<div class="container py-5">
+    @if (isLoading)
+    {
+        <h1>Confirming your email...</h1>
+    }
+    else if (confirmationSucceeded)
+    {
+        <h1>Email confirmed!</h1>
+        <p>Your email address has been successfully verified.</p>
+        <button type="button" class="btn btn-primary" @onclick="GoToLogin">Sign in</button>
+    }
+    else
+    {
+        <h1>Email confirmation failed</h1>
+        <p>We couldn't confirm your email address. The link may be invalid or expired.</p>
+        <button type="button" class="btn btn-primary" @onclick="GoToLogin">Return to login</button>
+    }
+</div>
 
 @code {
-    private string? statusMessage;
-
-    [CascadingParameter]
-    private HttpContext HttpContext { get; set; } = default!;
-
     [SupplyParameterFromQuery]
     private string? UserId { get; set; }
 
     [SupplyParameterFromQuery]
     private string? Code { get; set; }
 
+    private bool isLoading = true;
+    private bool confirmationSucceeded;
+
     protected override async Task OnInitializedAsync()
     {
-        if (UserId is null || Code is null)
+        if (!string.IsNullOrWhiteSpace(UserId) && !string.IsNullOrWhiteSpace(Code))
         {
-            RedirectManager.RedirectTo("");
-            return;
+            try
+            {
+                var response = await AuthApiClient.ConfirmEmailAsync(UserId, Code);
+                confirmationSucceeded = response.Succeeded;
+            }
+            catch
+            {
+                confirmationSucceeded = false;
+            }
         }
 
-        var user = await UserManager.FindByIdAsync(UserId);
-        if (user is null)
-        {
-            HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-            statusMessage = $"Error loading user with ID {UserId}";
-        }
-        else
-        {
-            var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(Code));
-            var result = await UserManager.ConfirmEmailAsync(user, code);
-            statusMessage = result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.";
-        }
+        isLoading = false;
     }
+
+    private void GoToLogin() => NavigationManager.NavigateTo("Account/Login");
 }

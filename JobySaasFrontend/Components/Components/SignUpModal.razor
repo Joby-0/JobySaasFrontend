@@ -3,11 +3,23 @@
 <Modal @ref="modal">
     <HeaderTemplate>
         <div>
-            <h5 class="modal-title mb-1">Create your account</h5>
+            <h5 class="modal-title mb-1">@(showConfirmation ? "Check your email" : "Create your account")</h5>
         </div>
     </HeaderTemplate>
 
     <BodyTemplate>
+        @if (showConfirmation)
+        {
+            <div class="text-center p-3">
+                <div class="display-4 text-primary mb-3" aria-hidden="true">✉</div>
+                <h4>Check your email</h4>
+                <p class="mb-4">We've sent a confirmation link to <strong>@registeredEmail</strong>. Please click the link in the email to verify your email address.</p>
+                <p class="mb-2">Already confirmed your email?</p>
+                <button type="button" class="btn btn-primary" @onclick="GoToLogin">Sign in</button>
+            </div>
+        }
+        else
+        {
         <EditForm Model="signupModel" OnValidSubmit="HandleSubmit" FormName="signup-form">
             <DataAnnotationsValidator />
 
@@ -64,6 +76,7 @@
                 </button>
             </div>
         </EditForm>
+        }
     </BodyTemplate>
 
     <FooterTemplate>

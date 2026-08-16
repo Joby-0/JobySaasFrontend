@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
 using JobySaasFrontend.Components.Account.Pages;
 using JobySaasFrontend.Components.Account.Pages.Manage;
@@ -23,6 +25,33 @@ internal static class IdentityComponentsEndpointRouteBuilderExtensions
         ArgumentNullException.ThrowIfNull(endpoints);
 
         var accountGroup = endpoints.MapGroup("/Account");
+
+        endpoints.MapPost("/api/auth/confirm-email", async (
+            ConfirmEmailRequest request,
+            [FromServices] UserManager<ApplicationUser> userManager) =>
+        {
+            if (string.IsNullOrWhiteSpace(request.UserId) || string.IsNullOrWhiteSpace(request.Code))
+            {
+                return Results.Ok(new ConfirmEmailResponse());
+            }
+
+            try
+            {
+                var user = await userManager.FindByIdAsync(request.UserId);
+                if (user is null)
+                {
+                    return Results.Ok(new ConfirmEmailResponse());
+                }
+
+                var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
+                var result = await userManager.ConfirmEmailAsync(user, code);
+                return Results.Ok(new ConfirmEmailResponse { Succeeded = result.Succeeded });
+            }
+            catch (ArgumentException)
+            {
+                return Results.Ok(new ConfirmEmailResponse());
+            }
+        });
 
         accountGroup.MapPost("/Register", async (
             HttpRequest request,

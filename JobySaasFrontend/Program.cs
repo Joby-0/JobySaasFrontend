@@ -5,16 +5,21 @@ using JobySaasFrontend.Components;
 using JobySaasFrontend.Components.Account;
 using JobySaasFrontend.Data;
 using JobySaasFrontend.Services;
+using Resend;
+using Configuration.Extensions;
+using Configuration.Options;
+using JobySaasFrontend.Configuration.Extension;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+
+builder.Configuration.AddSecrets( "JobySaasFrontend");
 
 builder.Services.AddAuthentication(options =>
     {
@@ -24,8 +29,7 @@ builder.Services.AddAuthentication(options =>
     .AddIdentityCookies();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(connectionString));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
@@ -37,8 +41,13 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
-builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<HttpClient>();
+builder.Services.AddScoped<IAuthApiClient, AuthApiClient>();
+builder.Services.AddResendOwn(builder.Configuration);
+
+builder.Services.AddScoped<IEmailSender<ApplicationUser>, EmailSender>();
+
 
 builder.Services.AddBlazorBootstrap();
 

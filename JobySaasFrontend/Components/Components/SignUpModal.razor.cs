@@ -17,12 +17,16 @@ public partial class SignUpModal
     private Modal? modal;
     private readonly SignupModel signupModel = new();
     private string? errorMessage;
+    private string? registeredEmail;
+    private bool showConfirmation;
     private bool isSubmitting;
 
     public async Task OpenModal()
     {
         if (modal is not null)
         {
+            showConfirmation = false;
+            registeredEmail = null;
             await modal.ShowAsync();
         }
     }
@@ -42,7 +46,7 @@ public partial class SignUpModal
 
         try
         {
-            var confirmationUrl = NavigationManager.ToAbsoluteUri("Account/ConfirmEmail").AbsoluteUri;
+            var confirmationUrl = NavigationManager.ToAbsoluteUri("account/confirm-email").AbsoluteUri;
             var response = await AuthService.RegisterAsync(new RegisterRequest
             {
                 FirstName = signupModel.FirstName,
@@ -58,14 +62,16 @@ public partial class SignUpModal
                 return;
             }
 
-            await CloseModal();
-            NavigationManager.NavigateTo($"Account/RegisterConfirmation?email={Uri.EscapeDataString(signupModel.Email)}");
+            registeredEmail = signupModel.Email;
+            showConfirmation = true;
         }
         finally
         {
             isSubmitting = false;
         }
     }
+
+    private void GoToLogin() => NavigationManager.NavigateTo("Account/Login");
 
     private sealed class SignupModel
     {
