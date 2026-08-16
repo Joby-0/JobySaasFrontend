@@ -46,7 +46,6 @@ public class AuthService : IAuthService
 
         var userId = await userManager.GetUserIdAsync(user);
         var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
-        Console.Write(code);
         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
         var callbackUrl = QueryHelpers.AddQueryString(confirmationUrl, new Dictionary<string, string?>
             {
