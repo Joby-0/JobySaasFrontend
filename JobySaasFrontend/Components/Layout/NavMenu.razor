@@ -1,10 +1,7 @@
-﻿@using JobySaasFrontend.Components.Components
 @inject NavigationManager NavigationManager
-
 
 <div class="container header-container">
     <header class="d-flex align-items-center justify-content-between site-header">
-
         <div class="logo">
             <NavLink href="/" class="text-decoration-none">
                 <span>JOBY</span>
@@ -12,24 +9,19 @@
         </div>
 
         <nav class="d-flex align-items-center gap-4">
-
             <div class="tools-wrapper">
-
                 <div class="tools-trigger">
                     <span class="nav-link">Tools</span>
                     <span class="tools-arrow" aria-hidden="true"></span>
                 </div>
-
                 <div class="tools-dropdown rounded-3">
                     <!-- Add tool links or content here -->
                 </div>
-
             </div>
 
             <NavLink href="/about" class="text-decoration-none ">
                 <span class="nav-link">About</span>
             </NavLink>
-
             <NavLink href="/pricing" class="text-decoration-none nav-link">
                 <span class="nav-link">Pricing</span>
             </NavLink>
@@ -39,24 +31,18 @@
                     <NavLink href="/dashboard" class="text-decoration-none nav-link">
                         <span class="nav-link">Dashboard</span>
                     </NavLink>
-
                     <NavLink href="/account" class="text-decoration-none nav-link">
                         <span class="nav-link">Account</span>
                     </NavLink>
                 </Authorized>
 
                 <NotAuthorized>
-                    <NavLink href="/login" class="text-decoration-none nav-link">
+                    <NavLink href="/Account/Login" class="text-decoration-none nav-link">
                         <span class="nav-link">Sign in</span>
                     </NavLink>
-
-                    <button class="btn btn-primary signup-button" @onclick="OpenRegisterModal">Sign up</button>
-                    <SignUpModal @ref="signUpModal"/>
-
+                    <NavLink href="/Account/Register" class="btn btn-primary signup-button">Sign up</NavLink>
                 </NotAuthorized>
             </AuthorizeView>
-
         </nav>
-
     </header>
 </div>

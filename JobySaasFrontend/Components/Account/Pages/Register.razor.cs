@@ -1,43 +1,20 @@
 using System.ComponentModel.DataAnnotations;
-using BlazorBootstrap;
 using JobySaasFrontend.Models.DTO;
 using JobySaasFrontend.Services;
 using Microsoft.AspNetCore.Components;
 
-namespace JobySaasFrontend.Components.Components;
+namespace JobySaasFrontend.Components.Account.Pages;
 
-public partial class SignUpModal
+public partial class Register
 {
-    [Inject]
-    private IAuthService AuthService { get; set; } = default!;
+    [Inject] private IAuthService AuthService { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
-    [Inject]
-    private NavigationManager NavigationManager { get; set; } = default!;
-
-    private Modal? modal;
-    private readonly SignupModel signupModel = new();
+    private readonly RegisterModel registerModel = new();
     private string? errorMessage;
     private string? registeredEmail;
     private bool showConfirmation;
     private bool isSubmitting;
-
-    public async Task OpenModal()
-    {
-        if (modal is not null)
-        {
-            showConfirmation = false;
-            registeredEmail = null;
-            await modal.ShowAsync();
-        }
-    }
-
-    private async Task CloseModal()
-    {
-        if (modal is not null)
-        {
-            await modal.HideAsync();
-        }
-    }
 
     private async Task HandleSubmit()
     {
@@ -47,13 +24,20 @@ public partial class SignUpModal
         try
         {
             var confirmationUrl = NavigationManager.ToAbsoluteUri("account/confirm-email").AbsoluteUri;
+            var nameParts = registerModel.FullName.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+            if (nameParts.Length == 0)
+            {
+                errorMessage = "Full name is required.";
+                return;
+            }
+
             var response = await AuthService.RegisterAsync(new RegisterRequest
             {
-                FirstName = signupModel.FirstName,
-                LastName = signupModel.LastName,
-                Email = signupModel.Email,
-                Password = signupModel.Password,
-                ConfirmPassword = signupModel.ConfirmPassword
+                FirstName = nameParts[0],
+                LastName = nameParts.Length > 1 ? nameParts[1] : string.Empty,
+                Email = registerModel.Email,
+                Password = registerModel.Password,
+                ConfirmPassword = registerModel.ConfirmPassword
             }, confirmationUrl);
 
             if (!response.Succeeded)
@@ -62,7 +46,7 @@ public partial class SignUpModal
                 return;
             }
 
-            registeredEmail = signupModel.Email;
+            registeredEmail = registerModel.Email;
             showConfirmation = true;
         }
         finally
@@ -71,15 +55,10 @@ public partial class SignUpModal
         }
     }
 
-    private void GoToLogin() => NavigationManager.NavigateTo("Account/Login");
-
-    private sealed class SignupModel
+    private sealed class RegisterModel
     {
-        [Required(ErrorMessage = "First name is required.")]
-        public string FirstName { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Last name is required.")]
-        public string LastName { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Full name is required.")]
+        public string FullName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Enter a valid email address.")]
