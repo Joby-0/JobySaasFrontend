@@ -1,48 +1,52 @@
+@using BlazorBootstrap
 @inject NavigationManager NavigationManager
 
-<div class="container header-container">
-    <header class="d-flex align-items-center justify-content-between site-header">
-        <div class="logo">
-            <NavLink href="/" class="text-decoration-none">
-                <span>JOBY</span>
-            </NavLink>
-        </div>
+<aside class="app-sidebar @(IsCollapsed ? "is-collapsed" : "") position-fixed top-0 start-0 z-3 d-flex flex-column vh-100 overflow-hidden bg-white border-end shadow-sm p-3">
+    <div class="sidebar-top d-flex align-items-center justify-content-between mb-4">
+        <NavLink href="/" class="sidebar-brand d-flex align-items-center color-primary text-decoration-none fs-4 fw-bold" aria-label="Joby home">
+            <span class="brand-label">JOBY</span>
+        </NavLink>
 
-        <nav class="d-flex align-items-center gap-4">
-            <div class="tools-wrapper">
-                <div class="tools-trigger">
-                    <span class="nav-link">Tools</span>
-                    <span class="tools-arrow" aria-hidden="true"></span>
-                </div>
-                <div class="tools-dropdown rounded-3">
-                    <!-- Add tool links or content here -->
-                </div>
-            </div>
+        <button type="button" class="sidebar-toggle btn btn-link text-primary p-0" @onclick="ToggleSidebar"
+                aria-label="@(IsCollapsed ? "Expand navigation" : "Collapse navigation")" aria-expanded="@(!IsCollapsed)">
+            <i class="bi @(IsCollapsed ? "bi-chevron-right" : "bi-chevron-left")" aria-hidden="true"></i>
+        </button>
+    </div>
 
-            <NavLink href="/about" class="text-decoration-none ">
-                <span class="nav-link">About</span>
-            </NavLink>
-            <NavLink href="/pricing" class="text-decoration-none nav-link">
-                <span class="nav-link">Pricing</span>
-            </NavLink>
+    <nav class="sidebar-nav d-flex flex-column flex-grow-1" aria-label="Main navigation">
+        <NavLink href="/" Match="NavLinkMatch.All" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Home">
+            <Icon Name="IconName.HouseFill" class="me-2"/>
+            <span>Home</span>
+        </NavLink>
+        <NavLink href="/videos" Match="NavLinkMatch.All" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Video">
+            <Icon Name="IconName.CameraVideo" class="me-2"/>
+            <span>Vidoes</span>
+        </NavLink>
+        <NavLink href="/pricing" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Pricing">
+            <Icon Name="IconName.GearFill" class="me-2" />
+            <span>Settings</span>
+        </NavLink>
+        <NavLink href="/dashboard" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Dashboard">
+            <Icon Name="IconName.GridFill" class="me-2"/>
+            <span>Dashboard</span>
+        </NavLink>
+        <NavLink href="/organisation" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Organisation">
+            <Icon Name="IconName.People" class="me-2"/>
+            <span>Organisation</span>
+        </NavLink>
+        <NavLink href="/account" class="sidebar-link mt-auto d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Account">
+            <Icon Name="IconName.PersonFill" class="me-2"/>
+            <span>Account</span>
+        </NavLink>
+    </nav>
+</aside>
 
-            <AuthorizeView>
-                <Authorized>
-                    <NavLink href="/dashboard" class="text-decoration-none nav-link">
-                        <span class="nav-link">Dashboard</span>
-                    </NavLink>
-                    <NavLink href="/account" class="text-decoration-none nav-link">
-                        <span class="nav-link">Account</span>
-                    </NavLink>
-                </Authorized>
+@code {
+    [Parameter]
+    public bool IsCollapsed { get; set; }
 
-                <NotAuthorized>
-                    <NavLink href="/Account/Login" class="text-decoration-none nav-link">
-                        <span class="nav-link">Sign in</span>
-                    </NavLink>
-                    <NavLink href="/Account/Register" class="btn btn-primary signup-button">Sign up</NavLink>
-                </NotAuthorized>
-            </AuthorizeView>
-        </nav>
-    </header>
-</div>
+    [Parameter]
+    public EventCallback<bool> IsCollapsedChanged { get; set; }
+
+    private Task ToggleSidebar() => IsCollapsedChanged.InvokeAsync(!IsCollapsed);
+}

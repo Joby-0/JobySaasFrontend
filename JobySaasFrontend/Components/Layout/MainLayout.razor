@@ -1,14 +1,18 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page container">
+<div class="app-shell @(sidebarCollapsed ? "sidebar-collapsed" : "")">
 
-    <NavMenu />
+    <NavMenu @bind-IsCollapsed="sidebarCollapsed" />
 
 
-    <main>
-        <article class="content px-4">
+    <main class="app-content">
+        <article class="content p-4">
             @Body
         </article>
     </main>
 
 </div>
+
+@code {
+    private bool sidebarCollapsed;
+}
