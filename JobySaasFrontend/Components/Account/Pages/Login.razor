@@ -1,5 +1,5 @@
 ﻿@page "/Account/Login"
-
+@layout AuthLayout
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
@@ -13,60 +13,59 @@
 
 <PageTitle>Log in</PageTitle>
 
-<h1>Log in</h1>
-<div class="row">
-    <div class="col-lg-6">
+<div class="row min-vh-100 align-items-center justify-content-center">
+    <div id="loginbox" class="col-11 col-md-8 col-lg-5 rounded-3">
         <section>
-            <StatusMessage Message="@errorMessage" />
-            <EditForm EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="login">
+            <h1 class="pb-3 fw-bold">Welcome back</h1>
+
+            <EditForm class="login-form" EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator />
-                <h2>Use a local account to log in.</h2>
-                <hr />
+                <StatusMessage Message="@errorMessage" />
                 <ValidationSummary class="text-danger" role="alert" />
-                <div class="form-floating mb-3">
-                    <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username webauthn" aria-required="true" placeholder="name@example.com" />
-                    <label for="Input.Email" class="form-label">Email</label>
-                    <ValidationMessage For="() => Input.Email" class="text-danger" />
+                <div class="row g-3 login-fields">
+                    <div class="col-12 form-floating">
+                        <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username webauthn" aria-required="true" placeholder="Email" />
+                        <label for="Input.Email">Email</label>
+                        <ValidationMessage For="() => Input.Email" class="invalid-feedback d-block ps-1" />
+                    </div>
+                    <div class="col-12 form-floating">
+                        <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Password" />
+                        <label for="Input.Password">Password</label>
+                        <ValidationMessage For="() => Input.Password" class="invalid-feedback d-block ps-1" />
+                        <p class="ps-1"><a href="Account/ForgotPassword">Forgot your password?</a></p>
+                    </div>
                 </div>
-                <div class="form-floating mb-3">
-                    <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label for="Input.Password" class="form-label">Password</label>
-                    <ValidationMessage For="() => Input.Password" class="text-danger" />
+                <div class="form-check mt-3">
+                    <InputCheckbox @bind-Value="Input.RememberMe" id="remember-me" class="form-check-input" />
+                    <label class="form-check-label" for="remember-me">Remember me</label>
                 </div>
-                <div class="checkbox mb-3">
-                    <label class="form-label">
-                        <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input" />
-                        Remember me
-                    </label>
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary">Log in</button>
                 </div>
-                <div>
-                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+
+                <div class="login-divider" aria-hidden="true">
+                    <span>or continue with</span>
                 </div>
-                <hr />
-                <div class="d-flex flex-column">
-                    <span class="text-secondary mx-auto mt-2">OR</span>
-                    <PasskeySubmit Operation="PasskeyOperation.Request" Name="Input.Passkey" EmailName="Input.Email" class="btn btn-link mx-auto">Log in with a passkey</PasskeySubmit>
-                </div>
-                <hr />
-                <div>
-                    <p>
-                        <a href="Account/ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a href="Account/ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
+
+                <div class="d-grid">
+                    <PasskeySubmit Operation="PasskeyOperation.Request" Name="Input.Passkey" EmailName="Input.Email" class="btn btn-outline-secondary">Log in with a passkey</PasskeySubmit>
                 </div>
             </EditForm>
-        </section>
-    </div>
-    <div class="col-lg-4 col-lg-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
-            <hr />
-            <ExternalLoginPicker />
+            
+            <form class="google-login-form d-grid pt-3" action="Account/PerformExternalLogin" method="post">
+                <AntiforgeryToken />
+                <input type="hidden" name="provider" value="Google" />
+                <input type="hidden" name="ReturnUrl" value="@ReturnUrl" />
+                <button type="Button" class="btn btn-outline-secondary google-login-button">
+                    <span class="google-icon" aria-hidden="true"></span>
+                    Login with Google
+                </button>
+            </form>
+
+            <div class="text-center mt-4">
+                <p>Are you new? <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Create account</a></p>
+                <p class="mb-0"><a href="Account/ResendEmailConfirmation">Resend email confirmation</a></p>
+            </div>
         </section>
     </div>
 </div>
