@@ -1,0 +1,11 @@
+.confirm-email-box {
+    background-color: white;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.12);
+    padding: 3.5rem;
+}
+
+@media (max-width: 575.98px) {
+    .confirm-email-box {
+        padding: 2rem;
+    }
+}
