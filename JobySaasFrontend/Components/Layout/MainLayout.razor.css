@@ -27,6 +27,7 @@
 }
 
 .app-content {
+    position: relative;
     min-height: 100vh;
     margin-left: 240px;
     transition: margin-left 220ms ease;

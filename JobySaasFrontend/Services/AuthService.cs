@@ -54,25 +54,25 @@ public class AuthService : IAuthService
         }
         var userId = await userManager.GetUserIdAsync(user);
         // 2. Create user in API database
-        var apiResponse = await authApiClient.RegisterAsync(new ApiRegisterRequest
-        {
-            UserId = userId!,
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            Email = request.Email,
-            Password = request.Password
+        // var apiResponse = await authApiClient.RegisterAsync(new ApiRegisterRequest
+        // {
+        //     UserId = userId!,
+        //     FirstName = request.FirstName,
+        //     LastName = request.LastName,
+        //     Email = request.Email,
+        //     Password = request.Password
             
-        });
+        // });
 
-        if (!apiResponse.Success)
-        {
-            // API registration failed.
-            // Remove the Identity user so we don't leave
-            // a partially registered account behind.
-            await userManager.DeleteAsync(user);
+        // if (!apiResponse.Success)
+        // {
+        //     // API registration failed.
+        //     // Remove the Identity user so we don't leave
+        //     // a partially registered account behind.
+        //     await userManager.DeleteAsync(user);
 
-            return RegisterResponse.Failure(new[] { "The account could not be created." });
-        }
+        //     return RegisterResponse.Failure(new[] { "The account could not be created." });
+        // }
 
         // 3. Generate Identity email confirmation token
 

@@ -1,16 +1,12 @@
-<details class="account-menu position-relative">
-    <summary class="sidebar-link d-flex align-items-center py-2 rounded text-dark"
-             title="Account">
+<div class="btn-group dropup">
+    <button type="button" class="btn dropdown-toggle bg-white text-start" data-bs-toggle="dropdown" aria-expanded="false">
         <i class="bi bi-person-fill me-2" aria-hidden="true"></i>
         <span>Account</span>
-    </summary>
-
-    <div class="account-dropdown position-absolute rounded border bg-white p-2 shadow"
-         role="menu">
-        <LogoutForm />
-
+    </button>
+    <ul class="dropdown-menu">
         <a class="dropdown-item text-decoration-none" href="/Account">Account</a>
         <a class="dropdown-item text-decoration-none" href="/organisation">Organisation</a>
         <a class="dropdown-item text-decoration-none" href="/pricing">Settings</a>
-    </div>
-</details>
+        <LogoutForm />
+    </ul>
+</div>
