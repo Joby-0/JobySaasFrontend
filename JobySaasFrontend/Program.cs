@@ -32,6 +32,11 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+builder.Services.AddHttpClient<IAuthApiClient, AuthApiClient>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7001/"!);
+});
+
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
     {
         options.SignIn.RequireConfirmedAccount = true;
@@ -43,7 +48,6 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<HttpClient>();
-builder.Services.AddScoped<IAuthApiClient, AuthApiClient>();
 builder.Services.AddResendOwn(builder.Configuration);
 
 builder.Services.AddScoped<IEmailSender<ApplicationUser>, EmailSender>();

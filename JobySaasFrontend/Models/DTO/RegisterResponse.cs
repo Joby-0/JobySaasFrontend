@@ -13,3 +13,10 @@ public class RegisterResponse
         Errors = errors.ToArray()
     };
 }
+
+public class ApiRegisterResponse
+{
+   public bool Success { get; set; }
+   public string Message { get; set; }
+}
+
