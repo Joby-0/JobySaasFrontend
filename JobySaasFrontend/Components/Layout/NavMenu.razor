@@ -1,9 +1,10 @@
 @using BlazorBootstrap
 @inject NavigationManager NavigationManager
-
-<aside class="app-sidebar @(IsCollapsed ? "is-collapsed" : "") position-fixed top-0 start-0 z-3 d-flex flex-column vh-100 overflow-hidden bg-white border-end shadow-sm p-3">
+<div class="sidebar-navigation @(IsCollapsed ? "is-collapsed" : "") d-flex flex-column flex-grow-1">
     <div class="sidebar-top d-flex align-items-center justify-content-between mb-4">
-        <NavLink href="/" class="sidebar-brand d-flex align-items-center color-primary text-decoration-none fs-4 fw-bold" aria-label="Joby home">
+        <NavLink href="/"
+                 class="sidebar-brand d-flex align-items-center color-primary text-decoration-none fs-4 fw-bold"
+                 aria-label="Joby home">
             <span class="brand-label">JOBY</span>
         </NavLink>
 
@@ -14,32 +15,36 @@
     </div>
 
     <nav class="sidebar-nav d-flex flex-column flex-grow-1" aria-label="Main navigation">
-        <NavLink href="/" Match="NavLinkMatch.All" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Home">
-            <Icon Name="IconName.HouseFill" class="me-2"/>
+        <NavLink href="/" Match="NavLinkMatch.All"
+                 class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Home">
+            <Icon Name="IconName.HouseFill" class="me-2" />
             <span>Home</span>
         </NavLink>
-        <NavLink href="/videos" Match="NavLinkMatch.All" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Video">
-            <Icon Name="IconName.CameraVideo" class="me-2"/>
+        <NavLink href="/videos" Match="NavLinkMatch.All"
+                 class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Video">
+            <Icon Name="IconName.CameraVideo" class="me-2" />
             <span>Vidoes</span>
         </NavLink>
-        <NavLink href="/pricing" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Pricing">
+        <NavLink href="/pricing"
+                 class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Pricing">
             <Icon Name="IconName.GearFill" class="me-2" />
             <span>Settings</span>
         </NavLink>
-        <NavLink href="/dashboard" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Dashboard">
-            <Icon Name="IconName.GridFill" class="me-2"/>
+        <NavLink href="/dashboard"
+                 class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none"
+                 title="Dashboard">
+            <Icon Name="IconName.GridFill" class="me-2" />
             <span>Dashboard</span>
         </NavLink>
-        <NavLink href="/organisation" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Organisation">
-            <Icon Name="IconName.People" class="me-2"/>
+        <NavLink href="/organisation"
+                 class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none"
+                 title="Organisation">
+            <Icon Name="IconName.People" class="me-2" />
             <span>Organisation</span>
         </NavLink>
-        <NavLink href="/account" class="sidebar-link mt-auto d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Account">
-            <Icon Name="IconName.PersonFill" class="me-2"/>
-            <span>Account</span>
-        </NavLink>
+
     </nav>
-</aside>
+</div>
 
 @code {
     [Parameter]

@@ -1,0 +1,11 @@
+<form action="/Account/Logout"
+      method="post"
+      data-enhance="false">
+    <AntiforgeryToken />
+    <input type="hidden" name="returnUrl" value="/" />
+    <button type="submit"
+            class="btn btn-link dropdown-item text-start text-danger text-decoration-none">
+        <span class="bi bi-box-arrow-right me-2" aria-hidden="true"></span>
+        Logout
+    </button>
+</form>

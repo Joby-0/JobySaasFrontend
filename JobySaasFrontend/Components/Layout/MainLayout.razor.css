@@ -1,10 +1,38 @@
+.app-sidebar {
+    width: 240px;
+    transition: width 220ms ease;
+}
+
+.app-sidebar:has(.sidebar-navigation.is-collapsed) {
+    width: 50px;
+}
+
+.app-sidebar:has(.sidebar-navigation.is-collapsed) .account-dropdown {
+    left: 34px !important;
+    bottom: 0;
+}
+
+.app-sidebar:has(.sidebar-navigation.is-collapsed) .account-menu summary {
+    justify-content: center;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+}
+
+.app-sidebar:has(.sidebar-navigation.is-collapsed) .account-menu summary .me-2 {
+    margin-right: 0 !important;
+}
+
+.app-sidebar:has(.sidebar-navigation.is-collapsed) .account-menu summary span:last-child {
+    display: none;
+}
+
 .app-content {
     min-height: 100vh;
     margin-left: 240px;
     transition: margin-left 220ms ease;
 }
 
-.sidebar-collapsed .app-content {
+.app-shell:has(.sidebar-navigation.is-collapsed) .app-content {
     margin-left: 50px;
 }
 
@@ -13,7 +41,7 @@
         margin-left: 210px;
     }
 
-    .sidebar-collapsed .app-content {
+    .app-shell:has(.sidebar-navigation.is-collapsed) .app-content {
         margin-left: 50px;
     }
 }

@@ -52,11 +52,11 @@
                 </div>
             </EditForm>
             
-            <form class="google-login-form d-grid pt-3" action="Account/PerformExternalLogin" method="post">
+            <form class="google-login-form d-grid pt-3" action="/Account/PerformExternalLogin" method="post" data-enhance="false">
                 <AntiforgeryToken />
                 <input type="hidden" name="provider" value="Google" />
                 <input type="hidden" name="ReturnUrl" value="@ReturnUrl" />
-                <button type="Button" class="btn btn-outline-secondary google-login-button">
+                <button type="submit" class="btn btn-outline-secondary google-login-button">
                     <span class="google-icon" aria-hidden="true"></span>
                     Login with Google
                 </button>

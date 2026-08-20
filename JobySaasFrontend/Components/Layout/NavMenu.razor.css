@@ -23,23 +23,65 @@
     text-align: center;
 }
 
-.is-collapsed {
+.sidebar-navigation.is-collapsed {
     width: 50px;
 }
 
-.is-collapsed .sidebar-top {
+.sidebar-navigation.is-collapsed .sidebar-top {
     justify-content: center !important;
 }
 
-.is-collapsed .brand-label,
-.is-collapsed .sidebar-link span {
+.sidebar-navigation.is-collapsed .brand-label,
+.sidebar-navigation.is-collapsed .sidebar-link span {
     display: none;
 }
 
-.is-collapsed .sidebar-link {
+.sidebar-navigation.is-collapsed .sidebar-link {
     justify-content: center;
     padding-right: 0 !important;
     padding-left: 0 !important;
+}
+
+.account-menu {
+    margin-top: auto;
+}
+
+.account-menu summary {
+    list-style: none;
+    cursor: pointer;
+}
+
+.account-menu summary::-webkit-details-marker {
+    display: none;
+}
+
+.account-dropdown {
+    bottom: 100%;
+    display: block;
+    min-width: 170px;
+}
+
+.account-menu:not([open]) .account-dropdown {
+    display: none;
+}
+
+.app-sidebar:has(.sidebar-navigation.is-collapsed) .account-dropdown {
+    left: 34px !important;
+    bottom: 0;
+}
+
+.app-sidebar:has(.sidebar-navigation.is-collapsed) .account-menu summary {
+    justify-content: center;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+}
+
+.app-sidebar:has(.sidebar-navigation.is-collapsed) .account-menu summary .me-2 {
+    margin-right: 0 !important;
+}
+
+.app-sidebar:has(.sidebar-navigation.is-collapsed) .account-menu summary span:last-child {
+    display: none;
 }
 
 @media (max-width: 767.98px) {
