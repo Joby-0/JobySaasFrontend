@@ -1,6 +1,6 @@
 @inherits LayoutComponentBase
-@using JobySaasFrontend.Components.Account.Shared
 
+@using JobySaasFrontend.Components.Account.Shared
 <div class="app-shell">
     <aside class="app-sidebar position-fixed top-0 start-0 z-3 d-flex flex-column vh-100 overflow-visible bg-white border-end shadow-sm p-3">
         <NavMenu @rendermode="InteractiveServer" />
@@ -13,3 +13,7 @@
         </article>
     </main>
 </div>
+
+@code {
+    private bool IsSidebarCollapsed;
+}

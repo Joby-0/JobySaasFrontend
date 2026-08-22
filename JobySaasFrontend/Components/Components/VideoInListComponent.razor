@@ -1,0 +1,57 @@
+<div class="content-row">
+    <div class="content-thumb">
+        @if (!string.IsNullOrEmpty(ThumbnailUrl))
+        {
+            <img src="@ThumbnailUrl" alt="@Title" />
+        }
+        else
+        {
+            <div class="content-thumb-placeholder"></div>
+        }
+    </div>
+
+    <div class="content-main">
+        <span class="content-title">@Title</span>
+        <span class="content-meta">@Platform · @RelativeTime</span>
+    </div>
+
+    <span class="status-badge status-@Status.ToString().ToLower()">
+        <span class="status-dot"></span>
+        @StatusLabel
+    </span>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string Platform { get; set; } = string.Empty;
+    [Parameter] public string? ThumbnailUrl { get; set; }
+    [Parameter] public DateTime PublishedAt { get; set; }
+    [Parameter] public ContentStatus Status { get; set; }
+
+    private string StatusLabel => Status switch
+    {
+        ContentStatus.Waiting => "Waiting",
+        ContentStatus.Uploading => "Uploading",
+        ContentStatus.Uploaded => "Uploaded",
+        ContentStatus.Error => "Error",
+        _ => Status.ToString()
+    };
+
+    private string RelativeTime
+    {
+        get
+        {
+            var diff = DateTime.UtcNow - PublishedAt;
+            if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes}m ago";
+            if (diff.TotalHours < 24) return $"{(int)diff.TotalHours}h ago";
+            return $"{(int)diff.TotalDays}d ago";
+        }
+    }
+    public enum ContentStatus
+    {
+        Waiting,
+        Uploading,
+        Uploaded,
+        Error
+    }
+}
