@@ -5,5 +5,4 @@ namespace JobySaasFrontend.Services;
 public interface IAuthApiClient
 {
     Task<ConfirmEmailResponse> ConfirmEmailAsync(string userId, string code, CancellationToken cancellationToken = default);
-    Task<ApiRegisterResponse> RegisterAsync(ApiRegisterRequest request);
 }

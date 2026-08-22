@@ -24,24 +24,4 @@ public sealed class AuthApiClient(HttpClient httpClient, NavigationManager navig
         return await response.Content.ReadFromJsonAsync<ConfirmEmailResponse>(cancellationToken)
             ?? new ConfirmEmailResponse();
     }
-    public async Task<ApiRegisterResponse> RegisterAsync(ApiRegisterRequest request)
-    {
-        var response = await httpClient.PostAsJsonAsync("api/auth/register", request);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            return new ApiRegisterResponse
-            {
-                Success = false,
-                Message = "Unable to create API account."
-            };
-        }
-
-        return await response.Content.ReadFromJsonAsync<ApiRegisterResponse>()
-               ?? new ApiRegisterResponse
-               {
-                   Success = false,
-                   Message = "Invalid API response."
-               };
-    }
 }
