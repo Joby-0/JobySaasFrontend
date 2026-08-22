@@ -5,7 +5,6 @@
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
-<SetupModal @ref="setupModal" />
 @* only show if user dont have finsh registartion *@
 <div class="get-started-box">
 
@@ -34,7 +33,6 @@
 </section>
 
 @code {
-    private SetupModal? setupModal;
     private List<RecentContentItem> RecentContent = new()
     {
         new RecentContentItem("Untitled", "YouTube", null, DateTime.UtcNow.AddMinutes(-8), JobySaasFrontend.Components.Components.VideoInListComponent.ContentStatus.Uploading),
@@ -52,11 +50,9 @@ JobySaasFrontend.Components.Components.VideoInListComponent.ContentStatus Status
 
     private async Task OpenOrganizationSetup()
     {
-        await setupModal!.OpenAsync(1);
     }
 
     private async Task OpenPlanSetup()
     {
-        await setupModal!.OpenAsync(2);
     }
 }
