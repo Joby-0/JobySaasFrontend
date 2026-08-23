@@ -1,5 +1,7 @@
 using JobySaasFrontend.Encryption;
 
+namespace JobySaasFrontend.Models.DTO;
+
 public class LoginResponse
 {
     public Guid? UserId { get; set; }

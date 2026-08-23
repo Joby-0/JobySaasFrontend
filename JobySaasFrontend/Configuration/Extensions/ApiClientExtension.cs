@@ -12,16 +12,17 @@ public static class ApiClientExtensions
         services.AddTransient<JwtAuthHandler>();
         
         services.AddApiClient<IAuthApiClient, AuthApiClient>(apiBaseUrl);
-
-        // add a new line here each time you create a new typed client
+        services.AddApiClient<IOrganizationApiClient, OrganizationApiClient>(apiBaseUrl);
+        services.AddApiClient<ISubscriptionApiClient, SubscriptionApiClient>(apiBaseUrl);
+        services.AddApiClient<IYoutubeApiClient, YoutubeApiClient>(apiBaseUrl);
+        services.AddApiClient<IInvitationApiClient, InvitationApiClient>(apiBaseUrl);
 
         return services;
     }
 
-    private static IServiceCollection AddApiClient<TInterface, TImplementation>(
-        this IServiceCollection services, string baseUrl)
-        where TInterface : class
-        where TImplementation : class, TInterface
+    private static IServiceCollection AddApiClient<TInterface, TImplementation>(this IServiceCollection services, string baseUrl)
+    where TInterface : class
+    where TImplementation : class, TInterface
     {
         services.AddHttpClient<TInterface, TImplementation>(client =>
         {
