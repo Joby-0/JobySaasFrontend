@@ -12,6 +12,8 @@ using JobySaasFrontend.Encryption.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpContextAccessor();
+
 // Add services to the container.
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
@@ -36,10 +38,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddHttpClient<IAuthApiClient, AuthApiClient>(client =>
-{
-    client.BaseAddress = new Uri("https://localhost:7001/"!);
-});
+builder.Services.AddApiClients(builder.Configuration);;
 
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
     {
