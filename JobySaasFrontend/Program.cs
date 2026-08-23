@@ -7,8 +7,8 @@ using JobySaasFrontend.Data;
 using JobySaasFrontend.Services;
 using Resend;
 using Configuration.Extensions;
-using Configuration.Options;
 using JobySaasFrontend.Configuration.Extension;
+using JobySaasFrontend.Encryption.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,14 +19,18 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
-builder.Configuration.AddSecrets( "JobySaasFrontend");
+builder.Configuration.AddSecrets("JobySaasFrontend");
 
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultScheme = IdentityConstants.ApplicationScheme;
         options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-    })
-    .AddIdentityCookies();
+    }).AddIdentityCookies();
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connectionString));
@@ -42,15 +46,20 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
         options.SignIn.RequireConfirmedAccount = true;
         options.Stores.SchemaVersion = IdentitySchemaVersions.Version3;
     })
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<HttpClient>();
 builder.Services.AddResendOwn(builder.Configuration);
+builder.Services.AddEncryptions(builder.Configuration);
+builder.Services.AddJwtTokenService(builder.Configuration);
 
 builder.Services.AddScoped<IEmailSender<ApplicationUser>, EmailSender>();
+
 
 
 builder.Services.AddBlazorBootstrap();
@@ -71,11 +80,12 @@ else
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();

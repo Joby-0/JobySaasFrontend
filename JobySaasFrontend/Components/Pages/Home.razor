@@ -1,9 +1,9 @@
 ﻿@page "/"
 @using JobySaasFrontend.Components.Components
 @using Microsoft.AspNetCore.Authorization
-@attribute [Authorize] 
-@rendermode InteractiveServer
 
+@rendermode InteractiveServer
+@attribute [Authorize] 
 <PageTitle>Home</PageTitle>
 @* only show if user dont have finsh registartion *@
 <div class="get-started-box">
