@@ -1,0 +1,57 @@
+@using JobySaasFrontend.Services
+@inject ISubscriptionApiClient SubscriptionApi
+
+<div class="d-flex justify-content-center">
+    <div class="w-100" style="max-width: 480px;">
+
+        <div class="text-center mb-4">
+            <h4 class="fw-bold" style="color: var(--color-primary);">Choose a plan</h4>
+            <p class="text-muted">You can change or cancel whenever you want</p>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="text-center py-4">
+                <span class="spinner-border spinner-border-sm"></span>
+            </div>
+        }
+        else
+        {
+           
+        }
+
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter] public Guid OrganizationId { get; set; }
+
+    @* private List<PlanDto> plans = []; *@
+    private Guid? selectedPlanId;
+    private bool isLoading = true;
+    private bool isSubmitting;
+
+    protected override async Task OnInitializedAsync()
+    {
+        @* plans = await SubscriptionApi.(); *@
+        isLoading = false;
+    }
+
+    private async Task Submit()
+    {
+        if (selectedPlanId is null) return;
+
+        isSubmitting = true;
+        try
+        {
+            var checkout = await SubscriptionApi.CreateSubscriptionCheckoutAsync(OrganizationId, selectedPlanId.Value);
+            // hand the checkout URL to PaymentStep, or navigate straight to it here
+            await OnCompleted.InvokeAsync();
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

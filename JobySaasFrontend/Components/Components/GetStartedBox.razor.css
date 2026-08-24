@@ -1,0 +1,38 @@
+.progress-line-bg,
+.progress-line-fill {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 24px;
+    transform: translateY(-50%);
+    border-radius: 28px;
+}
+
+.progress-line-bg {
+    background-color: rgba(61, 64, 91, 0.15);
+}
+
+.progress-line-fill {
+    background-color: var(--color-third);
+    transition: width 0.3s ease;
+    z-index: 1;
+}
+
+.step-circle {
+    width: 18px;
+    height: 18px;
+    background-color: white;
+    border: none;
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    position: relative;
+    z-index: 2;
+    transition: all 0.25s ease;
+}
+
+.step-circle.step-active {
+    background-color: var(--color-third);
+    color: white;
+} 

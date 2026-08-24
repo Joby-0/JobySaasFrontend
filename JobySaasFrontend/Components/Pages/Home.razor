@@ -3,39 +3,50 @@
 @using Microsoft.AspNetCore.Authorization
 
 @rendermode InteractiveServer
-@attribute [Authorize] 
+@attribute [Authorize]
 <PageTitle>Home</PageTitle>
-@* only show if user dont have finsh registartion *@
-<div class="get-started-box">
+
+<GetStartedModal @ref="setupModal" />
+<div class="container">
+
+    <div class="get-started-box">
+        <GetStartedBox OnStart="HandleStartOnboarding" />
+
+    </div>
+    <div class="border-bottom">
+        <h2>Today</h2>
+    </div>
+    <div class="d-flex my-5 stats-row">
+
+        <div class="col stats-box"></div>
+        <div class="col stats-box"></div>
+    </div>
+    <div class="d-flex actions-row">
+        <div class="col link-box"></div>
+        <div class="col link-box"></div>
+        <div class="col link-box"></div>
+        <div class="col link-box"></div>
+    </div>
+    <section class="recent-content mt-5">
+        <div class="section-header">
+            <h2>Recent content</h2>
+            <a href="/content" class="see-all-link">See all</a>
+        </div>
+        <div class="content-list">
+            @foreach (var item in RecentContent)
+            {
+                <VideoInListComponent Title="@item.Title" Platform="@item.Platform" ThumbnailUrl="@item.ThumbnailUrl"
+                                      PublishedAt="@item.PublishedAt" Status="@item.Status" />
+            }
+        </div>
+    </section>
 
 </div>
-<div class="d-flex my-5 stats-row">
-    <div class="col stats-box"></div>
-    <div class="col stats-box"></div>
-</div>
-<div class="d-flex actions-row">
-    <div class="col link-box"></div>
-    <div class="col link-box"></div>
-    <div class="col link-box"></div>
-    <div class="col link-box"></div>
-</div>
-<section class="recent-content mt-5">
-    <div class="section-header">
-        <h2>Recent content</h2>
-        <a href="/content" class="see-all-link">See all</a>
-    </div>
-    <div class="content-list">
-        @foreach (var item in RecentContent)
-        {
-            <VideoInListComponent Title="@item.Title" Platform="@item.Platform" ThumbnailUrl="@item.ThumbnailUrl" PublishedAt="@item.PublishedAt" Status="@item.Status" />
-        }
-    </div>
-</section>
-
 @code {
     private List<RecentContentItem> RecentContent = new()
     {
-        new RecentContentItem("Untitled", "YouTube", null, DateTime.UtcNow.AddMinutes(-8), JobySaasFrontend.Components.Components.VideoInListComponent.ContentStatus.Uploading),
+        new RecentContentItem("Untitled", "YouTube", null, DateTime.UtcNow.AddMinutes(-8),
+JobySaasFrontend.Components.Components.VideoInListComponent.ContentStatus.Uploading),
         new RecentContentItem("Untitled", "TikTok", null, DateTime.UtcNow.AddHours(-3),
     JobySaasFrontend.Components.Components.VideoInListComponent.ContentStatus.Uploaded),
         new RecentContentItem("Untitled", "Instagram", null, DateTime.UtcNow.AddHours(-6),
@@ -47,12 +58,11 @@
     private record RecentContentItem(string Title, string Platform, string? ThumbnailUrl, DateTime PublishedAt,
 JobySaasFrontend.Components.Components.VideoInListComponent.ContentStatus Status);
 
+    private GetStartedModal setupModal = default!;
 
-    private async Task OpenOrganizationSetup()
+    private async Task HandleStartOnboarding(int step)
     {
+        await setupModal.OpenAsync(step);
     }
 
-    private async Task OpenPlanSetup()
-    {
-    }
 }

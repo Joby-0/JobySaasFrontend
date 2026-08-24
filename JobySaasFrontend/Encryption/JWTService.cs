@@ -4,6 +4,7 @@ using System.Security.Claims;
 using Microsoft.Extensions.Options;
 
 using JobySaasFrontend.Encryption.Options;
+using JobySaasFrontend.Models.DTO;
 
 namespace JobySaasFrontend.Encryption;
 
