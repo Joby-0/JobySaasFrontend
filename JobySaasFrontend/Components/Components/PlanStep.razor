@@ -1,8 +1,10 @@
+@using BlazorBootstrap
+@using JobySaasFrontend.Models.DTO
 @using JobySaasFrontend.Services
 @inject ISubscriptionApiClient SubscriptionApi
 
 <div class="d-flex justify-content-center">
-    <div class="w-100" style="max-width: 480px;">
+    <div class="w-100">
 
         <div class="text-center mb-4">
             <h4 class="fw-bold" style="color: var(--color-primary);">Choose a plan</h4>
@@ -17,7 +19,133 @@
         }
         else
         {
-           
+            <div class="plans-div container">
+                <div class="billing-switch">
+
+                    <button class="billing-option @(billing == 1 ? "active" : "")" @onclick="() => billing = 1">
+                        Monthly
+                    </button>
+
+                    <button class="billing-option @(billing == 12 ? "active" : "")" @onclick="() => billing = 12">
+                        Yearly
+                        <span class="save-badge">Save</span>
+                    </button>
+
+                </div>
+
+                <div class="row justify-content-center g-4">
+                    @foreach (var plan in plans.Where(x => x.BillingIntervalInMonths == billing))
+                    {
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="plan rounded-4 border h-100">
+
+                                <div class="plan-header">
+                                    <div class="plan-name">
+                                        <span>@plan.Name</span>
+                                    </div>
+
+                                    <div class="purpose-div">
+                                        @plan.Description
+                                    </div>
+                                </div>
+
+                                <div class="price-div">
+                                    <span>€@plan.Price</span>
+                                    <small>/ month</small>
+                                </div>
+
+                                <div class="small-info-div">
+                                    <span>Per organization, billed @(billing == 1 ? "monthly" : "yearly")</span>
+                                </div>
+
+                                <hr />
+
+                                <div class="feature-div">
+                                    <p class="feature-title">What's included</p>
+
+                                    <ul class="list-unstyled">
+                                        @foreach (var f in plan.Features)
+                                        {
+                                            <li>
+                                                <Icon Class="check" Name="IconName.Check2" />
+                                                <span>@f</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+
+                                <div class="plan-footer">
+                                    <button class="btn plan-btn w-100">
+                                        Get started
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                    <!-- Free -->
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="plan rounded-4 border h-100">
+
+                            <div class="plan-header">
+                                <div class="plan-name">
+                                    <span>Free</span>
+                                </div>
+
+                                <div class="purpose-div">
+                                    For very small teams
+                                </div>
+                            </div>
+
+                            <div class="price-div">
+                                <span>€0</span>
+                                <small>/ month</small>
+                            </div>
+
+                            <div class="small-info-div">
+                                Per organization
+                            </div>
+
+                            <hr />
+
+                            <div class="feature-div">
+                                <p class="feature-title">What's included</p>
+
+                                <ul class="list-unstyled">
+                                    <li>
+                                        <Icon Class="check" Name="IconName.Check2" />
+                                        Up to 3 users
+                                    </li>
+
+                                    <li>
+                                        <Icon Class="check" Name="IconName.Check2" />
+                                        Up to 3 social accounts
+                                    </li>
+
+                                    <li>
+                                        <Icon Class="check" Name="IconName.Check2" />
+                                        Limited uploads
+                                    </li>
+
+                                    <li>
+                                        <Icon Class="check" Name="IconName.Check2" />
+                                        Basic analytics
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="plan-footer">
+                                <button class="btn plan-btn w-100">
+                                    Get started
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
         }
 
     </div>
@@ -27,14 +155,15 @@
     [Parameter] public EventCallback OnCompleted { get; set; }
     [Parameter] public Guid OrganizationId { get; set; }
 
-    @* private List<PlanDto> plans = []; *@
+    private IEnumerable<SubscriptionPlanDto> plans = [];
     private Guid? selectedPlanId;
     private bool isLoading = true;
     private bool isSubmitting;
+    private int billing = 1;
 
     protected override async Task OnInitializedAsync()
     {
-        @* plans = await SubscriptionApi.(); *@
+        @* plans = await SubscriptionApi.GetSubscriptionsAsync(); *@
         isLoading = false;
     }
 
@@ -45,7 +174,7 @@
         isSubmitting = true;
         try
         {
-            var checkout = await SubscriptionApi.CreateSubscriptionCheckoutAsync(OrganizationId, selectedPlanId.Value);
+            @* var checkout = await SubscriptionApi.CreateSubscriptionCheckoutAsync(OrganizationId, selectedPlanId.Value); *@
             // hand the checkout URL to PaymentStep, or navigate straight to it here
             await OnCompleted.InvokeAsync();
         }

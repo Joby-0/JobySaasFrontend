@@ -51,8 +51,8 @@
         isSubmitting = true;
         try
         {
-            @* await OrganizationApi.CreateOrganizationAsync(new CreateOrganizationRequest(orgName));
-            await OnCompleted.InvokeAsync(); *@
+            @* await OrganizationApi.CreateOrganizationAsync(new CreateOrganizationRequest(orgName)); *@
+            await OnCompleted.InvokeAsync(); 
         }
         finally
         {
