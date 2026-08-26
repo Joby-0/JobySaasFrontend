@@ -18,7 +18,7 @@
 </head>
 
 <body>
-    <Routes @rendermode="InteractiveServer"/>
+    <Routes @rendermode="RenderModeForPage"/>
     <ReconnectModal />
 
     <script src="@Assets["lib/bootstrap/dist/js/bootstrap.bundle.min.js"]"></script>
@@ -29,6 +29,14 @@
     <script src="@Assets["Components/Account/Shared/PasskeySubmit.razor.js"]"
             type="module"></script>
 </body>
+
+@code {
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    // Returns InteractiveServer for the app, but null (Static SSR) for Identity paths
+    private IComponentRenderMode? RenderModeForPage => HttpContext?.Request.Path.StartsWithSegments("/Account") == true ? null : InteractiveServer;
+}
 
 </html>
 
