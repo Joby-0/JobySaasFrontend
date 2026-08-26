@@ -34,7 +34,8 @@
                 </div>
 
                 <div class="row justify-content-center g-4">
-                    @foreach (var plan in plans.Where(x => x.BillingIntervalInMonths == billing))
+                    @foreach (var plan in plans.Where(x => x.BillingIntervalInMonths == billing || x.BillingIntervalInMonths
+                == 0))
                     {
                         <div class="col-12 col-md-6 col-lg-4">
                             <div class="plan rounded-4 border h-100">
@@ -50,7 +51,11 @@
                                 </div>
 
                                 <div class="price-div">
-                                    <span>€@plan.Price</span>
+                                    <span>
+                                        @(plan.BillingIntervalInMonths == 0
+                                            ? "€0"
+                                            : $"€{(plan.Price / plan.BillingIntervalInMonths):0.00}")
+                                    </span>
                                     <small>/ month</small>
                                 </div>
 
@@ -73,9 +78,8 @@
                                         }
                                     </ul>
                                 </div>
-
                                 <div class="plan-footer">
-                                    <button class="btn plan-btn w-100">
+                                    <button class="btn plan-btn w-100" @onclick="() => SelectPlan(plan)">
                                         Get started
                                     </button>
                                 </div>
@@ -83,65 +87,6 @@
                             </div>
                         </div>
                     }
-                    <!-- Free -->
-                    <div class="col-12 col-md-6 col-lg-4">
-                        <div class="plan rounded-4 border h-100">
-
-                            <div class="plan-header">
-                                <div class="plan-name">
-                                    <span>Free</span>
-                                </div>
-
-                                <div class="purpose-div">
-                                    For very small teams
-                                </div>
-                            </div>
-
-                            <div class="price-div">
-                                <span>€0</span>
-                                <small>/ month</small>
-                            </div>
-
-                            <div class="small-info-div">
-                                Per organization
-                            </div>
-
-                            <hr />
-
-                            <div class="feature-div">
-                                <p class="feature-title">What's included</p>
-
-                                <ul class="list-unstyled">
-                                    <li>
-                                        <Icon Class="check" Name="IconName.Check2" />
-                                        Up to 3 users
-                                    </li>
-
-                                    <li>
-                                        <Icon Class="check" Name="IconName.Check2" />
-                                        Up to 3 social accounts
-                                    </li>
-
-                                    <li>
-                                        <Icon Class="check" Name="IconName.Check2" />
-                                        Limited uploads
-                                    </li>
-
-                                    <li>
-                                        <Icon Class="check" Name="IconName.Check2" />
-                                        Basic analytics
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div class="plan-footer">
-                                <button class="btn plan-btn w-100">
-                                    Get started
-                                </button>
-                            </div>
-
-                        </div>
-                    </div>
                 </div>
 
             </div>
@@ -152,35 +97,23 @@
 </div>
 
 @code {
+    [Parameter] public SubscriptionPlanDto? SelectedPlan { get; set; }
+    [Parameter] public EventCallback<SubscriptionPlanDto> SelectedPlanChanged { get; set; }
     [Parameter] public EventCallback OnCompleted { get; set; }
-    [Parameter] public Guid OrganizationId { get; set; }
 
     private IEnumerable<SubscriptionPlanDto> plans = [];
     private Guid? selectedPlanId;
     private bool isLoading = true;
-    private bool isSubmitting;
-    private int billing = 1;
+    private int billing = 12;
 
     protected override async Task OnInitializedAsync()
     {
-        @* plans = await SubscriptionApi.GetSubscriptionsAsync(); *@
+        plans = await SubscriptionApi.GetSubscriptionsAsync();
         isLoading = false;
     }
-
-    private async Task Submit()
+    private async Task SelectPlan(SubscriptionPlanDto plan)
     {
-        if (selectedPlanId is null) return;
-
-        isSubmitting = true;
-        try
-        {
-            @* var checkout = await SubscriptionApi.CreateSubscriptionCheckoutAsync(OrganizationId, selectedPlanId.Value); *@
-            // hand the checkout URL to PaymentStep, or navigate straight to it here
-            await OnCompleted.InvokeAsync();
-        }
-        finally
-        {
-            isSubmitting = false;
-        }
+        await SelectedPlanChanged.InvokeAsync(plan);
+        await OnCompleted.InvokeAsync();
     }
 }

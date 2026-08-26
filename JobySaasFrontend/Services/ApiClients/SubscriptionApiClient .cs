@@ -24,15 +24,19 @@ public class SubscriptionApiClient : ISubscriptionApiClient
 
     public async Task<IEnumerable<SubscriptionPlanDto>> GetSubscriptionsAsync()
     {
-        var response = await _http.GetAsync("subscriptions/plans");
-        response.EnsureSuccessStatusCode();
-
+        var response = await _http.GetAsync("api/Subscription/plans"); // adjust to your actual route
         var content = await response.Content.ReadAsStringAsync();
-        var plans = JsonSerializer.Deserialize<List<SubscriptionPlanDto>>(content, new JsonSerializerOptions
+
+        var result = JsonSerializer.Deserialize<ApiResponse<List<SubscriptionPlanDto>>>(content, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         });
 
-        return plans ?? Enumerable.Empty<SubscriptionPlanDto>();
+        if (result is null || !result.Success)
+        {
+            throw new InvalidOperationException(result?.Error ?? "Failed to load subscription plans.");
+        }
+
+        return result.Data ?? [];
     }
 }

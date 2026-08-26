@@ -14,6 +14,9 @@ public class SubscriptionPlanDto
     public int Price { get; set; }
     public string StripePriceId { get; set; }
     public int BillingIntervalInMonths { get; set; }
+    public bool IsFree {get; set;} = false;
+    public bool ContactSales {get; set;}
     public string Description {get; set;}
     public List<string> Features {get; set;}
+
 }

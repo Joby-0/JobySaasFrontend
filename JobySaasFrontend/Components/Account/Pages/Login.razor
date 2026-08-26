@@ -145,7 +145,8 @@
             {
                 UserId = Guid.Parse(user.Id), // adjust if your ApplicationUser key isn't a Guid string
                 UserName = user.UserName,
-                UserRole = roles.FirstOrDefault() ?? "User"
+                UserRole = roles.FirstOrDefault() ?? "User",
+                Email = user.Email
             };
 
             var jwtUserToken = JwtService.CreateJwtUserToken(loginResponse);

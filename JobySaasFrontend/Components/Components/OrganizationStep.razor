@@ -11,52 +11,24 @@
             <p class="text-muted">This is the workspace your team and content will live in.</p>
         </div>
 
-        <EditForm Model="this" OnValidSubmit="Submit">
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Organization name</label>
-                <input class="form-control form-control-lg" @bind="orgName" placeholder="e.g. Acme Studios" />
-            </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Organization name</label>
+            <input class="form-control form-control-lg" @bind="@OrgName"
+                   @oninput="(e) => OrgNameChanged.InvokeAsync((string)e.Value!)" placeholder="e.g. Acme Studios" />
+        </div>
 
-            @* Room for more fields later, same pattern:
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Industry</label>
-                <input class="form-control" @bind="industry" />
-            </div>
-            *@
-
-            <div class="d-grid mt-4">
-                <button type="submit" class="btn btn-secondary btn-lg" disabled="@isSubmitting">
-                    @if (isSubmitting)
-                    {
-                        <span class="spinner-border spinner-border-sm me-2"></span>
-                    }
-                    Continue
-                </button>
-            </div>
-        </EditForm>
+        <div class="d-grid mt-4">
+            <button class="btn btn-secondary btn-lg" disabled="@string.IsNullOrWhiteSpace(OrgName)"
+                    @onclick="() => OnCompleted.InvokeAsync()">
+                Continue
+            </button>
+        </div>
 
     </div>
 </div>
 
 @code {
+    [Parameter] public string OrgName { get; set; } = "";
+    [Parameter] public EventCallback<string> OrgNameChanged { get; set; }
     [Parameter] public EventCallback OnCompleted { get; set; }
-
-    private string orgName = "";
-    private bool isSubmitting;
-
-    private async Task Submit()
-    {
-        if (string.IsNullOrWhiteSpace(orgName)) return;
-
-        isSubmitting = true;
-        try
-        {
-            @* await OrganizationApi.CreateOrganizationAsync(new CreateOrganizationRequest(orgName)); *@
-            await OnCompleted.InvokeAsync(); 
-        }
-        finally
-        {
-            isSubmitting = false;
-        }
-    }
 }

@@ -26,6 +26,7 @@ public class JWTService
             new Claim("UserId", usrSession.UserId.ToString()),
             new Claim("UserRole", usrSession.UserRole.ToString()),
             new Claim("UserName", usrSession.UserName),
+            new Claim("Email", usrSession.Email),
             new Claim(JwtRegisteredClaimNames.Jti, TokenId.ToString()),
             new Claim(ClaimTypes.Role, usrSession.UserRole.ToString()),
             new Claim(ClaimTypes.NameIdentifier, usrSession.UserId.ToString())
