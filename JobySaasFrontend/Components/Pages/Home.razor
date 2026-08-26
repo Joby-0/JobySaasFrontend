@@ -6,11 +6,10 @@
 @attribute [Authorize]
 <PageTitle>Home</PageTitle>
 
-<GetStartedModal @ref="setupModal" />
 <div class="container">
 
     <div class="get-started-box">
-        <GetStartedBox OnStart="HandleStartOnboarding" />
+        <GetStartedBox  />
 
     </div>
     <div class="border-bottom">
@@ -58,11 +57,5 @@ JobySaasFrontend.Components.Components.VideoInListComponent.ContentStatus.Upload
     private record RecentContentItem(string Title, string Platform, string? ThumbnailUrl, DateTime PublishedAt,
 JobySaasFrontend.Components.Components.VideoInListComponent.ContentStatus Status);
 
-    private GetStartedModal setupModal = default!;
-
-    private async Task HandleStartOnboarding(int step)
-    {
-        await setupModal.OpenAsync(step);
-    }
 
 }

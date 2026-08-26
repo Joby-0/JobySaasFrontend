@@ -1,0 +1,42 @@
+@page "/onboarding/complete"
+@using JobySaasFrontend.Services;
+@using JobySaasFrontend.Models.DTO;
+@* @rendermode InteractiveServer *@
+@inject IOrganizationApiClient OrganizationApi
+@inject NavigationManager NavigationManager
+
+<div class="text-center py-5">
+    @if (isLoading)
+    {
+        <span class="spinner-border"></span>
+    }
+    else if (organization is not null)
+    {
+        <h2 class="fw-bold" style="color: var(--color-primary);">You're all set!</h2>
+        <p class="text-muted">@organization.Name is ready to go.</p>
+        <button class="btn btn-secondary" @onclick="GoToDashboard">Go to dashboard</button>
+    }
+    else
+    {
+        <h4>We couldn't confirm your setup.</h4>
+        <p class="text-muted">If you completed payment, this may take a moment — try refreshing, or contact support if it persists.</p>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery] public Guid? OrganizationId { get; set; }
+
+    private OrganizationDto? organization;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (OrganizationId is not null)
+        {
+            organization = await OrganizationApi.GetOrganizationAsync(OrganizationId.Value);
+        }
+        isLoading = false;
+    }
+
+    private void GoToDashboard() => NavigationManager.NavigateTo("/dashboard");
+}

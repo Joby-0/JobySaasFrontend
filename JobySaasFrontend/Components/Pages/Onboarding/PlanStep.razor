@@ -1,11 +1,14 @@
+@page "/onboarding/plan"
 @using BlazorBootstrap
-@using JobySaasFrontend.Models.DTO
-@using JobySaasFrontend.Services
+@using JobySaasFrontend.Services;
+@using JobySaasFrontend.Models.DTO;
+@* @rendermode InteractiveServer *@
+@inject OnboardingStateService State
 @inject ISubscriptionApiClient SubscriptionApi
+@inject NavigationManager NavigationManager
 
 <div class="d-flex justify-content-center">
     <div class="w-100">
-
         <div class="text-center mb-4">
             <h4 class="fw-bold" style="color: var(--color-primary);">Choose a plan</h4>
             <p class="text-muted">You can change or cancel whenever you want</p>
@@ -13,68 +16,41 @@
 
         @if (isLoading)
         {
-            <div class="text-center py-4">
-                <span class="spinner-border spinner-border-sm"></span>
-            </div>
+            <div class="text-center py-4"><span class="spinner-border spinner-border-sm"></span></div>
         }
         else
         {
             <div class="plans-div container">
                 <div class="billing-switch">
-
-                    <button class="billing-option @(billing == 1 ? "active" : "")" @onclick="() => billing = 1">
-                        Monthly
-                    </button>
-
+                    <button class="billing-option @(billing == 1 ? "active" : "")" @onclick="() => billing = 1">Monthly</button>
                     <button class="billing-option @(billing == 12 ? "active" : "")" @onclick="() => billing = 12">
-                        Yearly
-                        <span class="save-badge">Save</span>
+                        Yearly <span class="save-badge">Save</span>
                     </button>
-
                 </div>
 
                 <div class="row justify-content-center g-4">
-                    @foreach (var plan in plans.Where(x => x.BillingIntervalInMonths == billing || x.BillingIntervalInMonths
-                == 0))
+                    @foreach (var plan in plans.Where(x => x.BillingIntervalInMonths == billing || x.BillingIntervalInMonths == 0))
                     {
                         <div class="col-12 col-md-6 col-lg-4">
                             <div class="plan rounded-4 border h-100">
-
                                 <div class="plan-header">
-                                    <div class="plan-name">
-                                        <span>@plan.Name</span>
-                                    </div>
-
-                                    <div class="purpose-div">
-                                        @plan.Description
-                                    </div>
+                                    <div class="plan-name"><span>@plan.Name</span></div>
+                                    <div class="purpose-div">@plan.Description</div>
                                 </div>
-
                                 <div class="price-div">
-                                    <span>
-                                        @(plan.BillingIntervalInMonths == 0
-                                            ? "€0"
-                                            : $"€{(plan.Price / plan.BillingIntervalInMonths):0.00}")
-                                    </span>
+                                    <span>@(plan.BillingIntervalInMonths == 0 ? "€0" : $"€{(plan.Price / plan.BillingIntervalInMonths):0.00}")</span>
                                     <small>/ month</small>
                                 </div>
-
                                 <div class="small-info-div">
                                     <span>Per organization, billed @(billing == 1 ? "monthly" : "yearly")</span>
                                 </div>
-
                                 <hr />
-
                                 <div class="feature-div">
                                     <p class="feature-title">What's included</p>
-
                                     <ul class="list-unstyled">
                                         @foreach (var f in plan.Features)
                                         {
-                                            <li>
-                                                <Icon Class="check" Name="IconName.Check2" />
-                                                <span>@f</span>
-                                            </li>
+                                            <li><Icon Class="check" Name="IconName.Check2" /> <span>@f</span></li>
                                         }
                                     </ul>
                                 </div>
@@ -83,26 +59,17 @@
                                         Get started
                                     </button>
                                 </div>
-
                             </div>
                         </div>
                     }
                 </div>
-
             </div>
-
         }
-
     </div>
 </div>
 
 @code {
-    [Parameter] public SubscriptionPlanDto? SelectedPlan { get; set; }
-    [Parameter] public EventCallback<SubscriptionPlanDto> SelectedPlanChanged { get; set; }
-    [Parameter] public EventCallback OnCompleted { get; set; }
-
     private IEnumerable<SubscriptionPlanDto> plans = [];
-    private Guid? selectedPlanId;
     private bool isLoading = true;
     private int billing = 12;
 
@@ -111,9 +78,10 @@
         plans = await SubscriptionApi.GetSubscriptionsAsync();
         isLoading = false;
     }
-    private async Task SelectPlan(SubscriptionPlanDto plan)
+
+    private void SelectPlan(SubscriptionPlanDto plan)
     {
-        await SelectedPlanChanged.InvokeAsync(plan);
-        await OnCompleted.InvokeAsync();
+        State.SelectedPlan = plan;
+        NavigationManager.NavigateTo("/onboarding/review");
     }
 }

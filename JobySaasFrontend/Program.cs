@@ -53,6 +53,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<HttpClient>();
+builder.Services.AddScoped<OnboardingStateService>();
 builder.Services.AddResendOwn(builder.Configuration);
 builder.Services.AddEncryptions(builder.Configuration);
 builder.Services.AddJwtTokenService(builder.Configuration);

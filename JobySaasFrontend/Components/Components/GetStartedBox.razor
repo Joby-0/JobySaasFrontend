@@ -1,5 +1,7 @@
 @using JobySaasFrontend.Services
 @inject IOrganizationApiClient OrganizationApi
+
+@inject NavigationManager NavigationManager
 @if (!isLoading && !hasOrganization)
 {
     <div class="">
@@ -16,7 +18,8 @@
                 {
                     var stepIndex = i;
                     <div class="d-flex flex-column align-items-center step-circle-wrap">
-                        <span class="badge rounded-circle d-flex align-items-center justify-content-center step-circle @(stepIndex <= CurrentStep ? "step-active" : "")">
+                        <span
+                            class="badge rounded-circle d-flex align-items-center justify-content-center step-circle @(stepIndex <= CurrentStep ? "step-active" : "")">
                             @stepIndex
                         </span>
                     </div>
@@ -28,12 +31,12 @@
             <span class="ms-2 fs-5">@StepNames[CurrentStep - 1]</span>
         </div>
 
-        <button @onclick="StartOnboarding" class="btn btn-secondary">Get started</button>
-    </div>
-}
+        <button @onclick='() => NavigationManager.NavigateTo("/onboarding/organization")' class="btn btn-secondary">Get
+            started</button>
+        </div>
+    }
 
 @code {
-    [Parameter] public EventCallback<int> OnStart { get; set; }
 
     private bool isLoading = true;
     private bool hasOrganization;
@@ -45,13 +48,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        @* var orgs = await OrganizationApi.GetMyOrganizationsAsync(); *@
-        @* hasOrganization = orgs.Count > 0; *@
+        @* var orgs = await OrganizationApi.GetOrganizationAsync();
+        hasOrganization = orgs.Count > 0; *@
         isLoading = false;
-    }
-
-    private async Task StartOnboarding()
-    {
-        await OnStart.InvokeAsync(1); // parent calls SetupModal.OpenAsync(1)
     }
 }

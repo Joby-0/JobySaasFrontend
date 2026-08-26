@@ -3,6 +3,7 @@ namespace JobySaasFrontend.Services;
 // Http/SubscriptionApiClient.cs
 using System.Net.Http.Json;
 using System.Text.Json;
+using JobySaasFrontend.Models;
 using JobySaasFrontend.Models.DTO;
 
 public class SubscriptionApiClient : ISubscriptionApiClient
@@ -11,7 +12,7 @@ public class SubscriptionApiClient : ISubscriptionApiClient
 
     public SubscriptionApiClient(HttpClient http) => _http = http;
 
-    public async Task<SubscriptionCheckoutResult> CreateSubscriptionCheckoutAsync(Guid organizationId, Guid subscriptionId)
+    public async Task<ServiceResult<string>> CreateSubscriptionCheckoutAsync(Guid organizationId, Guid subscriptionId)
     {
         var request = new SelectSubscriptionRequest(subscriptionId);
 
@@ -19,12 +20,12 @@ public class SubscriptionApiClient : ISubscriptionApiClient
 
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadFromJsonAsync<SubscriptionCheckoutResult>() ?? throw new InvalidOperationException("API returned an empty response for CreateSubscriptionCheckout.");
+        return await response.Content.ReadFromJsonAsync<ServiceResult<string>>() ?? throw new InvalidOperationException("API returned an empty response for CreateSubscriptionCheckout.");
     }
 
     public async Task<IEnumerable<SubscriptionPlanDto>> GetSubscriptionsAsync()
     {
-        var response = await _http.GetAsync("api/Subscription/plans"); // adjust to your actual route
+        var response = await _http.GetAsync("api/Subscription/plans");
         var content = await response.Content.ReadAsStringAsync();
 
         var result = JsonSerializer.Deserialize<ApiResponse<List<SubscriptionPlanDto>>>(content, new JsonSerializerOptions
