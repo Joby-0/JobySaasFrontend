@@ -1,16 +1,17 @@
 @page "/onboarding/review"
+@layout OnboardingLayout;
 @using JobySaasFrontend.Services;
 @using JobySaasFrontend.Models.DTO;
-@rendermode InteractiveServer
+@using JobySaasFrontend.Components.Components;
 @inject OnboardingStateService State
 @inject IOrganizationApiClient OrganizationApi
 @inject ISubscriptionApiClient SubscriptionApi
 @inject NavigationManager NavigationManager
 
-<div class="d-flex justify-content-center">
+<div class="d-flex justify-content-center pt-5">
     <div class="w-100" style="max-width: 600px;">
         <div class="text-center mb-4">
-            <h4 class="fw-bold" style="color: var(--color-primary);">Review</h4>
+            <h4 class="fw-bold">Review</h4>
             <p class="text-muted">Check everything looks right before continuing to payment.</p>
         </div>
 
@@ -75,17 +76,11 @@
             <div class="alert alert-danger">@errorMessage</div>
         }
 
-        <div class="d-grid mt-4">
-            <button class="btn btn-secondary btn-lg" disabled="@isSubmitting" @onclick="Submit">
-                @if (isSubmitting)
-                {
-                    <span class="spinner-border spinner-border-sm me-2"></span>
-                }
-                Continue to payment
-            </button>
-        </div>
+       
     </div>
 </div>
+<OnboardingFooter CurrentStep="3" OnBack="GoBack" IsSubmitting="isSubmitting" IsContinueDisabled="isSubmitting" ContinueLabel="Continue to payment" OnContinue="Submit" />
+
 
 @code {
     private bool isSubmitting;
@@ -99,6 +94,7 @@
             NavigationManager.NavigateTo("/onboarding/organization");
         }
     }
+    private void GoBack() => NavigationManager.NavigateTo("/onboarding/plan");
 
     private async Task Submit()
     {

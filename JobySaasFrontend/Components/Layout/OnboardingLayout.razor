@@ -1,0 +1,16 @@
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+
+<div class="position-relative top-0">
+    <button type="button" class="btn-close position-absolute top-0 start-0 p-5" aria-label="Close" @onclick="Close">
+    </button>
+
+    <div class="container">
+        @Body
+    </div>
+</div>
+
+@code {
+    private void Close() => NavigationManager.NavigateTo("/");
+
+}

@@ -1,13 +1,14 @@
 @page "/onboarding/organization"
+@layout OnboardingLayout;
 @using JobySaasFrontend.Services;
-@rendermode InteractiveServer
+@using JobySaasFrontend.Components.Components;
 @inject OnboardingStateService State
 @inject NavigationManager NavigationManager
 
-<div class="d-flex justify-content-center">
+<div class="d-flex justify-content-center pt-5 ">
     <div class="w-100" style="max-width: 480px;">
         <div class="text-center mb-4">
-            <h4 class="fw-bold" style="color: var(--color-primary);">Create your organization</h4>
+            <h4 class="fw-bold">Create your organization</h4>
             <p class="text-muted">This is the workspace your team and content will live in.</p>
         </div>
 
@@ -15,14 +16,9 @@
             <label class="form-label fw-semibold">Organization name</label>
             <input class="form-control form-control-lg" @bind="State.OrgName" @bind:event="oninput" placeholder="e.g. Acme Studios" />
         </div>
-
-        <div class="d-grid mt-4">
-            <button class="btn btn-secondary btn-lg" disabled="@string.IsNullOrWhiteSpace(State.OrgName)" @onclick="Next">
-                Continue
-            </button>
-        </div>
     </div>
 </div>
+<OnboardingFooter CurrentStep="1" ShowBack="false" IsContinueDisabled="@string.IsNullOrWhiteSpace(State.OrgName)" OnContinue="Next" />
 
 @code {
     private void Next() => NavigationManager.NavigateTo("/onboarding/plan");

@@ -1,0 +1,35 @@
+@* OnboardingFooter.razor *@
+<div class="onboarding-footer">
+    <button class="btn btn-outline-secondary footer-back" @onclick="() => OnBack.InvokeAsync()" disabled="@(!ShowBack)">
+        Back
+    </button>
+
+    <span class="footer-step-counter">Step @CurrentStep of @TotalSteps</span>
+
+    @if (ShowContinue)
+    {
+        <button class="btn btn-secondary footer-continue" disabled="@IsContinueDisabled" @onclick="() => OnContinue.InvokeAsync()">
+            @if (IsSubmitting)
+            {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+            }
+            @ContinueLabel
+        </button>
+    }
+    else
+    {
+        <div class="footer-continue-spacer"></div>
+    }
+</div>
+
+@code {
+    [Parameter] public int CurrentStep { get; set; }
+    [Parameter] public int TotalSteps { get; set; } = 4;
+    [Parameter] public bool ShowBack { get; set; } = true;
+    [Parameter] public bool ShowContinue { get; set; } = true;
+    [Parameter] public bool IsContinueDisabled { get; set; }
+    [Parameter] public bool IsSubmitting { get; set; }
+    [Parameter] public string ContinueLabel { get; set; } = "Continue";
+    [Parameter] public EventCallback OnBack { get; set; }
+    [Parameter] public EventCallback OnContinue { get; set; }
+}
