@@ -1,0 +1,130 @@
+@page "/onboarding/complete"
+@layout OnboardingLayout;
+@using JobySaasFrontend.Services;
+@inject IOrganizationApiClient OrganizationApi
+@inject NavigationManager NavigationManager
+
+@inject IOrganizationApiClient OrganizationApi
+@inject ISubscriptionApiClient SubscriptionApi
+@inject NavigationManager NavigationManager
+
+<div class="d-flex justify-content-center">
+    <div class="text-center w-100" style="max-width: 600px;">
+
+        @* @if (status == CheckStatusEnum.Checking) *@
+        {
+            <div class="status-card">
+
+                <div class="status-icon status-icon-loading">
+                    <span class="spinner-border"></span>
+                </div>
+
+                <h2 class="fw-bold mt-4" style="color: var(--color-primary);">
+                    Confirming your subscription
+                </h2>
+
+                <p class="text-muted mb-0">
+                    We're checking your payment. This should only take a moment.
+                </p>
+
+            </div>
+        }
+        @* else if (status == CheckStatusEnum.Active) *@
+        {
+            <div class="status-card">
+
+                <div class="status-icon status-icon-success">
+                    ✓
+                </div>
+
+                <h2 class="fw-bold mt-4" style="color: var(--color-primary);">
+                    You're all set!
+                </h2>
+
+                <p class="text-muted">
+                    <strong>@organizationName</strong> is ready to go.
+                </p>
+
+                <div class="mt-4">
+                    <button class="btn btn-secondary btn-lg px-4" @onclick="GoToDashboard">
+                        Go to dashboard
+                    </button>
+                </div>
+
+            </div>
+        }
+        @* else *@
+        {
+            <div class="status-card">
+
+                <div class="status-icon status-icon-warning">
+                    !
+                </div>
+
+                <h4 class="fw-bold mt-4" style="color: var(--color-primary);">
+                    Still confirming your payment
+                </h4>
+
+                <p class="text-muted">
+                    Your payment is still being processed.
+                    This can take a few seconds.
+                </p>
+
+                <div class="reference-box mt-4">
+                    <span class="text-muted small">
+                        Reference
+                    </span>
+
+                    <span class="fw-semibold text-break">
+                        @OrganizationId
+                    </span>
+                </div>
+
+                <button class="btn btn-outline-secondary mt-4" @onclick="CheckStatus">
+                    Check again
+                </button>
+
+            </div>
+        }
+
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromQuery] public Guid? OrganizationId { get; set; }
+
+    private enum CheckStatusEnum { Checking, Active, Pending }
+    private CheckStatusEnum status = CheckStatusEnum.Checking;
+    private string? organizationName;
+    private int attempts = 0;
+
+    protected override async Task OnInitializedAsync() => await CheckStatus();
+
+    private async Task CheckStatus()
+    {
+        if (OrganizationId is null) { status = CheckStatusEnum.Pending; return; }
+
+        status = CheckStatusEnum.Checking;
+        var org = await OrganizationApi.GetOrganizationAsync(OrganizationId.Value);
+        // assumes OrganizationDto or a subscription-status endpoint tells you if it's active
+        // exact check depends on what SubscriptionService actually exposes — tbd below
+
+        organizationName = org?.Name;
+
+        if (/* subscription is active */ false) // placeholder — depends on your data shape
+        {
+            status = CheckStatusEnum.Active;
+        }
+        else if (attempts++ < 5)
+        {
+            await Task.Delay(1500);
+            await CheckStatus(); // simple retry-with-delay, since webhook may not have landed yet
+        }
+        else
+        {
+            status = CheckStatusEnum.Pending;
+        }
+    }
+
+    private void GoToDashboard() => NavigationManager.NavigateTo("/dashboard");
+}

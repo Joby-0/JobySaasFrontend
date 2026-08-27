@@ -1,0 +1,117 @@
+@page "/onboarding/review"
+@layout OnboardingLayout;
+@using JobySaasFrontend.Services;
+@using JobySaasFrontend.Models.DTO;
+@using JobySaasFrontend.Components.Components;
+@inject OnboardingStateService State
+@inject IOrganizationApiClient OrganizationApi
+@inject ISubscriptionApiClient SubscriptionApi
+@inject NavigationManager NavigationManager
+
+<div class="d-flex justify-content-center pt-5">
+    <div class="w-100" style="max-width: 600px;">
+        <div class="text-center mb-4">
+            <h4 class="fw-bold">Review</h4>
+            <p class="text-muted">Check everything looks right before continuing to payment.</p>
+        </div>
+
+        <div class="d-flex flex-column gap-3">
+
+            <div class="border rounded-3 p-3 bg-white">
+                <div class="text-muted small mb-1">
+                    Organization
+                </div>
+
+                <div class="fw-semibold">
+                    @State.OrgName
+                </div>
+            </div>
+
+            <!-- Plan -->
+            <div class="border rounded-3 p-3 bg-white">
+                <div class="text-muted small mb-1">
+                    Plan
+                </div>
+
+                <div class="fw-semibold">
+                    @State.SelectedPlan?.Name
+                </div>
+
+                <div class="text-muted small mt-1">
+                    @if (State.SelectedPlan?.BillingIntervalInMonths == 12)
+                    {
+                        <span>€@State.SelectedPlan?.Price / year</span>
+                    }
+                    else
+                    {
+                        <span>€@State.SelectedPlan?.Price / month</span>
+                    }
+                </div>
+            </div>
+
+            <div class="border rounded-3 p-3 bg-white">
+                <div class="text-muted small mb-1">
+                    Payment
+                </div>
+
+                <div class="fw-semibold">
+                    @if (State.SelectedPlan?.ContactSales == true)
+                    {
+                        <span>Contact sales</span>
+                    }
+                    else if (State.SelectedPlan?.IsFree == true)
+                    {
+                        <span>Free plan</span>
+                    }
+                    else
+                    {
+                        <span>Stripe Checkout</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @if (errorMessage is not null)
+        {
+            <div class="alert alert-danger">@errorMessage</div>
+        }
+
+       
+    </div>
+</div>
+<OnboardingFooter CurrentStep="3" OnBack="GoBack" IsSubmitting="isSubmitting" IsContinueDisabled="isSubmitting" ContinueLabel="Continue to payment" OnContinue="Submit" />
+
+
+@code {
+    private bool isSubmitting;
+    private string? errorMessage;
+
+    protected override void OnInitialized()
+    {
+        // guard against landing here directly with no prior state
+        if (string.IsNullOrWhiteSpace(State.OrgName) || State.SelectedPlan is null)
+        {
+            NavigationManager.NavigateTo("/onboarding/organization");
+        }
+    }
+    private void GoBack() => NavigationManager.NavigateTo("/onboarding/plan");
+
+    private async Task Submit()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+        try
+        {
+            var org = await OrganizationApi.CreateOrganizationAsync(new CreateOrganizationRequest(State.OrgName));
+            var checkout = await SubscriptionApi.CreateSubscriptionCheckoutAsync(org.Id, State.SelectedPlan!.Id);
+
+            // real page leave — Stripe's hosted checkout, forceLoad required since it's an external URL
+            NavigationManager.NavigateTo(checkout.Data, forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Something went wrong creating your organization. Please try again.";
+            isSubmitting = false;
+        }
+    }
+}

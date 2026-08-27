@@ -1,9 +1,11 @@
 .get-started-box{
-    background-color: var(--color-primary);
+    /* background-color: var(--color-primary); */
     width: 100%; 
     height: 300px;
     border-radius: 12px;
 }
+
+
 .stats-box{
     background-color: var(--color-third);
     height: 400px;

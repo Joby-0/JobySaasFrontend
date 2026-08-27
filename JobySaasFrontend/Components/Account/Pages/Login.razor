@@ -4,12 +4,17 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
 @using JobySaasFrontend.Data
+@using JobySaasFrontend.Encryption
+@using JobySaasFrontend.Models.DTO
 
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+
+@inject JWTService JwtService
+@inject Encryptions Encryptions
 
 <PageTitle>Log in</PageTitle>
 
@@ -24,12 +29,14 @@
                 <ValidationSummary class="text-danger" role="alert" />
                 <div class="row g-3 login-fields">
                     <div class="col-12 form-floating">
-                        <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username webauthn" aria-required="true" placeholder="Email" />
+                        <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control"
+                                   autocomplete="username webauthn" aria-required="true" placeholder="Email" />
                         <label for="Input.Email">Email</label>
                         <ValidationMessage For="() => Input.Email" class="invalid-feedback d-block ps-1" />
                     </div>
                     <div class="col-12 form-floating">
-                        <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Password" />
+                        <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control"
+                                   autocomplete="current-password" aria-required="true" placeholder="Password" />
                         <label for="Input.Password">Password</label>
                         <ValidationMessage For="() => Input.Password" class="invalid-feedback d-block ps-1" />
                         <p class="ps-1"><a href="Account/ForgotPassword">Forgot your password?</a></p>
@@ -48,11 +55,13 @@
                 </div>
 
                 <div class="d-grid">
-                    <PasskeySubmit Operation="PasskeyOperation.Request" Name="Input.Passkey" EmailName="Input.Email" class="btn btn-outline-secondary">Log in with a passkey</PasskeySubmit>
+                    <PasskeySubmit Operation="PasskeyOperation.Request" Name="Input.Passkey" EmailName="Input.Email"
+                                   class="btn btn-outline-secondary">Log in with a passkey</PasskeySubmit>
                 </div>
             </EditForm>
-            
-            <form class="google-login-form d-grid pt-3" action="/Account/PerformExternalLogin" method="post" data-enhance="false">
+
+            <form class="google-login-form d-grid pt-3" action="/Account/PerformExternalLogin" method="post"
+                  data-enhance="false">
                 <AntiforgeryToken />
                 <input type="hidden" name="provider" value="Google" />
                 <input type="hidden" name="ReturnUrl" value="@ReturnUrl" />
@@ -63,12 +72,14 @@
             </form>
 
             <div class="text-center mt-4">
-                <p>Are you new? <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Create account</a></p>
-                <p class="mb-0"><a href="Account/ResendEmailConfirmation">Resend email confirmation</a></p>
-            </div>
-        </section>
+                <p>Are you new? <a
+                    href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Create
+                    account</a></p>
+                    <p class="mb-0"><a href="Account/ResendEmailConfirmation">Resend email confirmation</a></p>
+                </div>
+            </section>
+        </div>
     </div>
-</div>
 
 @code {
     private string? errorMessage;
@@ -126,6 +137,29 @@
         if (result.Succeeded)
         {
             Logger.LogInformation("User logged in.");
+
+            var user = await UserManager.FindByEmailAsync(Input.Email);
+            var roles = await UserManager.GetRolesAsync(user);
+
+            var loginResponse = new LoginResponse
+            {
+                UserId = Guid.Parse(user.Id), // adjust if your ApplicationUser key isn't a Guid string
+                UserName = user.UserName,
+                UserRole = roles.FirstOrDefault() ?? "User",
+                Email = user.Email
+            };
+
+            var jwtUserToken = JwtService.CreateJwtUserToken(loginResponse);
+            var encryptedPayload = Encryptions.AesEncryptToBase64(jwtUserToken);
+
+            HttpContext.Response.Cookies.Append("joby_api_token", encryptedPayload, new CookieOptions
+            {
+                HttpOnly = true, // JS can't read it — mitigates XSS token theft
+                Secure = true, // HTTPS only
+                SameSite = SameSiteMode.Lax,
+                Expires = jwtUserToken.ExpireTime
+            });
+
             RedirectManager.RedirectTo(ReturnUrl);
         }
         else if (result.RequiresTwoFactor)
