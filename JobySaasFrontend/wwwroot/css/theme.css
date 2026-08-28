@@ -343,3 +343,22 @@
 .bg-main {
     background-color: var(--color-background) !important;
 }
+
+
+.btn-outline-black {
+    border: 1px solid #000;
+    color: #000;
+    background: transparent;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-outline-black:hover {
+    background-color: #000;
+    color: #fff;
+}
+
+.btn-outline-black:disabled {
+    border-color: #ccc;
+    color: #aaa;
+    background: transparent;
+}

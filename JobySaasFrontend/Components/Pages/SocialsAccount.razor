@@ -1,0 +1,133 @@
+@page "/social-accounts"
+@rendermode InteractiveServer
+@using BlazorBootstrap
+@using JobySaasFrontend.Services;
+@using JobySaasFrontend.Models.DTO;
+@using JobySaasFrontend.Components.Components
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@inject IOrganizationApiClient OrganizationApi
+@inject ISocialAccountApiClient SocialAccountApi
+@inject IYoutubeApiClient YoutubeApi
+@inject NavigationManager NavigationManager
+
+<div class="container">
+    <div class="options-bar d-flex justify-content-between">
+        <div class="search-div">
+
+            <div class="search-bar">
+                <input class="form-control" type="search" placeholder="Search social accounts..." @bind="SearchTerm" @bind:event="oninput"  />
+            </div>
+
+            <button class="btn filter-btn" type="button" @onclick="ToggleFilters">
+                <Icon Name="IconName.Filter" />
+            </button>
+
+        </div>
+
+        @if (ShowFilters)
+        {
+            <div class="filter-bar">
+
+                
+
+            </div>
+        }
+        <div>
+            <button class="btn btn-outline-primary">Manage accounts</button>
+            <button class="btn btn-third" @onclick="OpenAddModal">
+                <Icon Name="IconName.Plus" /> Add account
+            </button>
+        </div>
+    </div>
+
+    <div class="list">
+        @if (isLoading)
+        {
+            <div class="text-center py-4"><span class="spinner-border spinner-border-sm"></span></div>
+        }
+        else if (accounts.Count == 0)
+        {
+            <p class="text-muted text-center py-4">No social accounts connected yet.</p>
+        }
+        else
+        {
+            @foreach (var account in accounts)
+            {
+                <div class="d-flex align-items-center justify-content-between border-bottom py-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-semibold">@account.Platform</span>
+                        <span class="text-muted">@account.AccountName</span>
+                    </div>
+                    <span class="badge @(account.IsActive ? "bg-success" : "bg-secondary")">
+                        @(account.IsActive ? "Connected" : "Inactive")
+                    </span>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<Modal @ref="addModal" Title="Add an account">
+    <BodyTemplate>
+        <div class="d-grid gap-2">
+            <button class="btn btn-outline-black d-flex align-items-center gap-2" @onclick="ConnectYoutube">
+                <PlatformIcon Platform="YouTube" /> YouTube
+            </button>
+            <button class="btn btn-outline-black d-flex align-items-center gap-2" disabled>
+                <PlatformIcon Platform="Instagram" /> Instagram <span class="badge bg-secondary ms-auto">Coming
+                soon</span>
+            </button>
+            <button class="btn btn-outline-black d-flex align-items-center gap-2" disabled>
+                <PlatformIcon Platform="TikTok" /> TikTok <span class="badge bg-secondary ms-auto">Coming soon</span>
+            </button>
+        </div>
+    </BodyTemplate>
+</Modal>
+
+@code {
+    private Modal addModal = default!;
+    private List<SocialAccountDto> accounts = [];
+    private bool isLoading = true;
+    private Guid? organizationId;
+
+    private string SearchTerm = "";
+    private bool ShowFilters = false;
+
+    private void Search(ChangeEventArgs e)
+    {
+        // Search logic later
+    }
+
+    private void ToggleFilters()
+    {
+        ShowFilters = !ShowFilters;
+    }
+
+    private void ClearFilters()
+    {
+        // Clear filters later
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var orgs = await OrganizationApi.GetMyOrganizationsAsync();
+        organizationId = orgs.FirstOrDefault()?.Id; // assumes single-org for now — revisit once org switching exists
+
+        if (organizationId is not null)
+        {
+            var result = await SocialAccountApi.GetConnectedAccountsAsync(organizationId.Value);
+            if (result.Success) accounts = result.Data;
+        }
+
+        isLoading = false;
+    }
+
+    private async Task OpenAddModal() => await addModal.ShowAsync();
+
+    private async Task ConnectYoutube()
+    {
+        var authUrl = await YoutubeApi.GetConnectUrlAsync();
+        NavigationManager.NavigateTo(authUrl, forceLoad: true); // leaving the app to Google — real redirect required
+    }
+}
