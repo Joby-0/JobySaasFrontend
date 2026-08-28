@@ -14,11 +14,25 @@
 <div class="container">
     <div class="options-bar d-flex justify-content-between">
         <div class="search-div">
-            <div class="search-bar"></div>
-            <button class="btn">
+
+            <div class="search-bar">
+                <input class="form-control" type="search" placeholder="Search social accounts..." @bind="SearchTerm" @bind:event="oninput"  />
+            </div>
+
+            <button class="btn filter-btn" type="button" @onclick="ToggleFilters">
                 <Icon Name="IconName.Filter" />
             </button>
+
         </div>
+
+        @if (ShowFilters)
+        {
+            <div class="filter-bar">
+
+                
+
+            </div>
+        }
         <div>
             <button class="btn btn-outline-primary">Manage accounts</button>
             <button class="btn btn-third" @onclick="OpenAddModal">
@@ -76,6 +90,24 @@
     private List<SocialAccountDto> accounts = [];
     private bool isLoading = true;
     private Guid? organizationId;
+
+    private string SearchTerm = "";
+    private bool ShowFilters = false;
+
+    private void Search(ChangeEventArgs e)
+    {
+        // Search logic later
+    }
+
+    private void ToggleFilters()
+    {
+        ShowFilters = !ShowFilters;
+    }
+
+    private void ClearFilters()
+    {
+        // Clear filters later
+    }
 
     protected override async Task OnInitializedAsync()
     {
