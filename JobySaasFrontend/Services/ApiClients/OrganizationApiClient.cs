@@ -17,6 +17,13 @@ public class OrganizationApiClient : IOrganizationApiClient
         return await response.Content.ReadFromJsonAsync<OrganizationDto>() ?? throw new InvalidOperationException("API returned an empty response for CreateOrganization.");
     }
 
+    public async Task<List<OrganizationDto>> GetMyOrganizationsAsync()
+    {
+        var response = await _http.GetAsync("api/Organization/mine");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<List<OrganizationDto>>() ?? [];
+    }
+
     public async Task<OrganizationDto?> GetOrganizationAsync(Guid organizationId)
     {
         var response = await _http.PostAsync($"api/Organization/GetOrganization/{organizationId}", null);

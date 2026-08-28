@@ -5,4 +5,6 @@ public interface IOrganizationApiClient
 {
     Task<OrganizationDto> CreateOrganizationAsync(CreateOrganizationRequest request);
     Task<OrganizationDto?> GetOrganizationAsync(Guid organizationId);
+
+    Task<List<OrganizationDto?>> GetMyOrganizationsAsync(); 
 }
