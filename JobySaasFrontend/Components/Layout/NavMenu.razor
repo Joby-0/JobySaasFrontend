@@ -1,8 +1,12 @@
 @using BlazorBootstrap
+@using JobySaasFrontend.Models.DTO
+@using JobySaasFrontend.Services
+@inject OrganizationStateService OrganizationState
 @inject NavigationManager NavigationManager
+@inject IOrganizationApiClient OrganizationApi
 
 <div class="sidebar-navigation @(IsCollapsed ? "is-collapsed" : "") d-flex flex-column flex-grow-1">
-    <div class="sidebar-top d-flex align-items-center justify-content-between mb-4">
+    <div class="sidebar-top d-flex align-items-center justify-content-between mb-2">
         <NavLink href="/"
                  class="sidebar-brand d-flex align-items-center color-primary text-decoration-none fs-4 fw-bold"
                  aria-label="Joby home">
@@ -14,6 +18,51 @@
             <i class="bi @(IsCollapsed ? "bi-chevron-right" : "bi-chevron-left")" aria-hidden="true"></i>
         </button>
     </div>
+
+    <Dropdown Class="mb-4 p-0 ">
+
+        <DropdownToggleButton class="organization-selector d-flex p-0 py-2">
+            <div class="me-2 organization-icon">
+                <Icon Name="IconName.People" />
+            </div>
+
+            <div class="organization-info me-2">
+
+                <span class="organization-name">
+                    @(OrganizationState.CurrentOrganization?.Name ?? "Select organization")
+                </span>
+            </div>
+
+            <Icon Class="organization-arrow" Name="IconName.ChevronDown" />
+
+        </DropdownToggleButton>
+
+        <DropdownMenu class="organization-dropdown w-100">
+
+            @foreach (var organization in OrganizationState.Organizations)
+            {
+                <DropdownItem @onclick="() => SelectOrganization(organization)">
+
+                    <div class="d-flex align-items-center gap-2 w-100">
+
+                        
+
+                        <span>@organization.Name</span>
+
+                        @if (SelectedOrganization?.Id == organization.Id)
+                        {
+                            <i class="bi bi-check ms-auto"></i>
+                        }
+
+                    </div>
+
+                </DropdownItem>
+            }
+
+        </DropdownMenu>
+
+    </Dropdown>
+
 
     <nav class="sidebar-nav d-flex flex-column flex-grow-1" aria-label="Main navigation">
         <NavLink href="/" Match="NavLinkMatch.All"
@@ -55,4 +104,23 @@
     public EventCallback<bool> IsCollapsedChanged { get; set; }
 
     private Task ToggleSidebar() => IsCollapsedChanged.InvokeAsync(!IsCollapsed);
+
+    private List<OrganizationDto> Organizations { get; set; } = new();
+    private OrganizationDto? SelectedOrganization { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await OrganizationState.LoadAsync();
+
+        if (OrganizationState.CurrentOrganization == null)
+            return;
+
+        NavigationManager.NavigateTo($"/org/{OrganizationState.CurrentOrganization.Id}/");
+    }
+    private void SelectOrganization(OrganizationDto organization)
+    {
+        SelectedOrganization = organization;
+
+        NavigationManager.NavigateTo($"/{organization.Id}/");
+    }
 }

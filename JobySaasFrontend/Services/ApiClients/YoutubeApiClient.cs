@@ -10,10 +10,13 @@ public class YoutubeApiClient : IYoutubeApiClient
 
     public YoutubeApiClient(HttpClient http) => _http = http;
 
-    public async Task<string> GetConnectUrlAsync()
+    public async Task<string> GetConnectUrlAsync(Guid organizationId)
     {
-        var response = await _http.GetAsync("api/youtube/connect");
+        var response = await _http.GetAsync(
+            $"api/youtube/connect?organizationId={organizationId}");
+
         response.EnsureSuccessStatusCode();
+
         return await response.Content.ReadAsStringAsync();
     }
 

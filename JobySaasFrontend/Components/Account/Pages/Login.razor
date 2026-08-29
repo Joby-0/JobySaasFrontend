@@ -155,7 +155,7 @@
             HttpContext.Response.Cookies.Append("joby_api_token", encryptedPayload, new CookieOptions
             {
                 HttpOnly = true, // JS can't read it — mitigates XSS token theft
-                Secure = true, // HTTPS only
+                Secure = false, // HTTPS only
                 SameSite = SameSiteMode.Lax,
                 Expires = jwtUserToken.ExpireTime
             });

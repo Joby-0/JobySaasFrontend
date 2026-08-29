@@ -127,7 +127,7 @@
 
     private async Task ConnectYoutube()
     {
-        var authUrl = await YoutubeApi.GetConnectUrlAsync();
+        var authUrl = await YoutubeApi.GetConnectUrlAsync(new Guid());
         NavigationManager.NavigateTo(authUrl, forceLoad: true); // leaving the app to Google — real redirect required
     }
 }

@@ -99,3 +99,18 @@
         transition: none;
     }
 }
+
+.dropdown-toggle::after {
+    display: none !important;
+}
+
+.organization-arrow {
+    margin-left: auto;
+    font-size: 12px;
+    transition: transform 0.2s ease;
+}
+
+/* Dropdown open */
+.organization-selector[aria-expanded="true"] .organization-arrow {
+    transform: rotate(180deg);
+}
