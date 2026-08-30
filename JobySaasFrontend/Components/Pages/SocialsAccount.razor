@@ -1,4 +1,4 @@
-@page "/social-accounts"
+@page "/org/{OrganizationId:guid}/social-accounts"
 @rendermode InteractiveServer
 @using BlazorBootstrap
 @using JobySaasFrontend.Services;
@@ -16,7 +16,8 @@
         <div class="search-div">
 
             <div class="search-bar">
-                <input class="form-control" type="search" placeholder="Search social accounts..." @bind="SearchTerm" @bind:event="oninput"  />
+                <input class="form-control" type="search" placeholder="Search social accounts..." @bind="SearchTerm"
+                       @bind:event="oninput" />
             </div>
 
             <button class="btn filter-btn" type="button" @onclick="ToggleFilters">
@@ -52,16 +53,36 @@
         }
         else
         {
+            // vill man ha en header på listan med vad varje fät är typ eller några kanske typ subs last sync och platform kanske 
             @foreach (var account in accounts)
             {
                 <div class="d-flex align-items-center justify-content-between border-bottom py-2">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="fw-semibold">@account.Platform</span>
-                        <span class="text-muted">@account.AccountName</span>
+                    <div>
+                        <Tooltip Color="TooltipColor.Secondary" Title="status">
+                            <div class="dot">.</div>
+                        </Tooltip>
                     </div>
-                    <span class="badge @(account.IsActive ? "bg-success" : "bg-secondary")">
-                        @(account.IsActive ? "Connected" : "Inactive")
-                    </span>
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="@account.ProfileImageUrl" alt="@account.AccountName" class="profile-pic rounded-circle" />
+                        <div>
+                            <div class="fw-semibold">@account.AccountName</div>
+                            <div class="text-muted small">@account.AccountName</div>
+                        </div>
+                    </div>
+                    <div>
+                        <span>Followers/subs</span>
+                    </div>
+                    <div class="d-flex">
+                        <div class="d-block">
+                            <span class="fw-semibold">Last sync</span>
+                            <span class="text-muted small">last sync</span>
+                        </div>
+
+                    </div>
+                    <div>
+                        <button class="btn">Show more</button>
+                        @* eller vill man ha en liten meny som dycker på på tre ... *@
+                    </div>
                 </div>
             }
         }
@@ -89,7 +110,9 @@
     private Modal addModal = default!;
     private List<SocialAccountDto> accounts = [];
     private bool isLoading = true;
-    private Guid? organizationId;
+
+    [Parameter]
+    public Guid OrganizationId { get; set; }
 
     private string SearchTerm = "";
     private bool ShowFilters = false;
@@ -111,14 +134,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var orgs = await OrganizationApi.GetMyOrganizationsAsync();
-        organizationId = orgs.FirstOrDefault()?.Id; // assumes single-org for now — revisit once org switching exists
+        var result = await SocialAccountApi.GetConnectedAccountsAsync(OrganizationId);
 
-        if (organizationId is not null)
-        {
-            var result = await SocialAccountApi.GetConnectedAccountsAsync(organizationId.Value);
-            if (result.Success) accounts = result.Data;
-        }
+        if (result.Success)
+            accounts = result.Data;
 
         isLoading = false;
     }
@@ -127,7 +146,8 @@
 
     private async Task ConnectYoutube()
     {
-        var authUrl = await YoutubeApi.GetConnectUrlAsync(new Guid());
-        NavigationManager.NavigateTo(authUrl, forceLoad: true); // leaving the app to Google — real redirect required
+        var authUrl = await YoutubeApi.GetConnectUrlAsync(OrganizationId);
+
+        NavigationManager.NavigateTo(authUrl, forceLoad: true);
     }
 }

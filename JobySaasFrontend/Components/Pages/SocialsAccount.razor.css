@@ -1,0 +1,5 @@
+.profile-pic {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+}

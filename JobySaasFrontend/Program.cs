@@ -40,6 +40,8 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddApiClients(builder.Configuration);;
 
+
+
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
     {
         options.SignIn.RequireConfirmedAccount = true;
@@ -59,7 +61,7 @@ builder.Services.AddEncryptions(builder.Configuration);
 builder.Services.AddJwtTokenService(builder.Configuration);
 
 builder.Services.AddScoped<IEmailSender<ApplicationUser>, EmailSender>();
-builder.Services.AddScoped<OrganizationStateService>();
+builder.Services.AddScoped<OrganizationStateService>(); //iterface on this maybe
 
 
 

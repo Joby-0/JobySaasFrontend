@@ -7,92 +7,76 @@
 
 <div class="sidebar-navigation @(IsCollapsed ? "is-collapsed" : "") d-flex flex-column flex-grow-1">
     <div class="sidebar-top d-flex align-items-center justify-content-between mb-2">
-        <NavLink href="/"
-                 class="sidebar-brand d-flex align-items-center color-primary text-decoration-none fs-4 fw-bold"
-                 aria-label="Joby home">
-            <span class="brand-label">JOBY</span>
-        </NavLink>
+        <Dropdown Class="mb-4 p-0 w-100">
 
-        <button type="button" class="sidebar-toggle btn btn-link text-primary p-0" @onclick="ToggleSidebar"
-                aria-label="@(IsCollapsed ? "Expand navigation" : "Collapse navigation")" aria-expanded="@(!IsCollapsed)">
-            <i class="bi @(IsCollapsed ? "bi-chevron-right" : "bi-chevron-left")" aria-hidden="true"></i>
-        </button>
-    </div>
+            <DropdownToggleButton class="organization-selector d-flex p-0 pb-2">
+                <div class="me-3 organization-icon">
+                    <Icon Name="IconName.People" />
+                </div>
 
-    <Dropdown Class="mb-4 p-0 ">
+                <div class="organization-info me-2">
 
-        <DropdownToggleButton class="organization-selector d-flex p-0 py-2">
-            <div class="me-2 organization-icon">
-                <Icon Name="IconName.People" />
-            </div>
+                    <span class="organization-name">
+                        @(OrganizationState.CurrentOrganization?.Name ?? "Select organization")
+                    </span>
+                </div>
 
-            <div class="organization-info me-2">
+                <Icon Class="organization-arrow" Name="IconName.ChevronDown" />
 
-                <span class="organization-name">
-                    @(OrganizationState.CurrentOrganization?.Name ?? "Select organization")
-                </span>
-            </div>
+            </DropdownToggleButton>
 
-            <Icon Class="organization-arrow" Name="IconName.ChevronDown" />
+            <DropdownMenu class="organization-dropdown w-100">
 
-        </DropdownToggleButton>
+                @foreach (var organization in OrganizationState.Organizations)
+                {
+                    <DropdownItem @onclick="() => SelectOrganization(organization)">
 
-        <DropdownMenu class="organization-dropdown w-100">
-
-            @foreach (var organization in OrganizationState.Organizations)
-            {
-                <DropdownItem @onclick="() => SelectOrganization(organization)">
-
-                    <div class="d-flex align-items-center gap-2 w-100">
+                        <div class="d-flex align-items-center gap-2 w-100">
 
                         
 
-                        <span>@organization.Name</span>
+                            <span>@organization.Name</span>
 
-                        @if (SelectedOrganization?.Id == organization.Id)
-                        {
-                            <i class="bi bi-check ms-auto"></i>
-                        }
+                            @if (SelectedOrganization?.Id == organization.Id)
+                            {
+                                <i class="bi bi-check ms-auto"></i>
+                            }
 
-                    </div>
+                        </div>
 
-                </DropdownItem>
-            }
+                    </DropdownItem>
+                }
 
-        </DropdownMenu>
+            </DropdownMenu>
 
-    </Dropdown>
+        </Dropdown>
+
+       
+    </div>
+
 
 
     <nav class="sidebar-nav d-flex flex-column flex-grow-1" aria-label="Main navigation">
-        <NavLink href="/" Match="NavLinkMatch.All"
-                 class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Home">
-            <Icon Name="IconName.HouseFill" class="me-2" />
+        <NavLink href="@GetOrgUrl("")" Match="NavLinkMatch.All" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Home">
+            <Icon Name="IconName.HouseFill" class="me-3" />
             <span>Home</span>
         </NavLink>
-        <NavLink href="/videos" Match="NavLinkMatch.All"
-                 class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Video">
-            <Icon Name="IconName.CameraVideo" class="me-2" />
+        <NavLink href="@GetOrgUrl("videos")" Match="NavLinkMatch.All" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Video">
+            <Icon Name="IconName.CameraVideo" class="me-3" />
             <span>Vidoes</span>
         </NavLink>
-        <NavLink href="/social-accounts"
-                 class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Pricing">
-            <Icon Name="IconName.GearFill" class="me-2" />
+        <NavLink href="@GetOrgUrl("social-accounts")" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Pricing">
+            <Icon Name="IconName.GearFill" class="me-3" />
             <span>Social accounts</span>
         </NavLink>
-        <NavLink href="/dashboard"
-                 class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none"
-                 title="Dashboard">
-            <Icon Name="IconName.GridFill" class="me-2" />
+        <NavLink href="@GetOrgUrl("dashboard")" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Dashboard">
+            <Icon Name="IconName.GridFill" class="me-3" />
             <span>Dashboard</span>
         </NavLink>
-        <NavLink href="/organisation"
-                 class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none"
-                 title="Organisation">
-            <Icon Name="IconName.People" class="me-2" />
+        <NavLink  href="@GetOrgUrl("organisation")" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Organisation">
+            <Icon Name="IconName.People" class="me-3" />
             <span>Organisation</span>
         </NavLink>
-
     </nav>
 </div>
 
@@ -111,16 +95,21 @@
     protected override async Task OnInitializedAsync()
     {
         await OrganizationState.LoadAsync();
-
-        if (OrganizationState.CurrentOrganization == null)
-            return;
-
-        NavigationManager.NavigateTo($"/org/{OrganizationState.CurrentOrganization.Id}/");
     }
     private void SelectOrganization(OrganizationDto organization)
     {
         SelectedOrganization = organization;
 
         NavigationManager.NavigateTo($"/{organization.Id}/");
+    }
+
+    private string GetOrgUrl(string page)
+    {
+        var organization = OrganizationState.CurrentOrganization;
+
+        if (organization == null)
+            return "/";
+
+        return $"/org/{organization.Id}/{page}";
     }
 }

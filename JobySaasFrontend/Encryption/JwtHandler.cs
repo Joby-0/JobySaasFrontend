@@ -1,6 +1,6 @@
 using System.Net.Http.Headers;
-
-namespace JobySaasFrontend.Encryption;
+using JobySaasFrontend.Encryption;
+using JobySaasFrontend.Services;
 
 public class JwtAuthHandler : DelegatingHandler
 {
@@ -17,9 +17,30 @@ public class JwtAuthHandler : DelegatingHandler
     {
         var cookie = _contextAccessor.HttpContext?.Request.Cookies["joby_api_token"];
 
+        JwtUserToken? jwtUserToken = null;
+
         if (!string.IsNullOrEmpty(cookie))
         {
-            var jwtUserToken = _encryptions.AesDecryptFromBase64<JwtUserToken>(cookie);
+            jwtUserToken = _encryptions.AesDecryptFromBase64<JwtUserToken>(cookie);
+        }
+
+        // No API token OR token is expired/about to expire
+        if (jwtUserToken == null || jwtUserToken.ExpireTime <= DateTime.UtcNow.AddMinutes(5))
+        {
+            try
+            {
+                // jwtUserToken = await _apiTokenService.RenewAsync();
+            }
+            catch
+            {
+                // Renewal failed.
+                // The Identity session may also have expired.
+                jwtUserToken = null;
+            }
+        }
+
+        if (jwtUserToken != null)
+        {
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", jwtUserToken.EncryptedToken);
         }
 

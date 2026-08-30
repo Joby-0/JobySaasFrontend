@@ -1,17 +1,74 @@
 @inherits LayoutComponentBase
+@using JobySaasFrontend.Services
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject OrganizationStateService OrganizationState
 
 @using JobySaasFrontend.Components.Account.Shared
 <div class="app-shell">
-    <aside class="app-sidebar position-fixed top-0 start-0 z-3 d-flex flex-column vh-100 overflow-visible bg-white border-end shadow-sm p-3">
-        <NavMenu/>
-        <AccountDropdown />
+
+    <!-- Sidebar -->
+    <aside
+        class="app-sidebar position-fixed top-0 start-0 z-3 d-flex flex-column vh-100 bg-white border-end shadow-sm p-3">
+
+        <NavMenu />
+
     </aside>
 
-    <main class="app-content">
-        <article class="content p-5">
-            @Body
-        </article>
-    </main>
+
+    <!-- Main area -->
+    <div class="app-main">
+
+        <!-- Header -->
+        <header class="app-header bg-white sticky-top">
+
+            <div class="app-header-inner d-flex justify-content-between p-2 ">
+
+                <!-- Search -->
+                <div class="header-search">
+
+                    @* <div class="input-group">
+
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+
+                        <input class="form-control border-start-0" type="search" placeholder="Search..." />
+
+                    </div> *@
+
+                </div>
+
+
+                <!-- Right side -->
+                <div class="header-actions">
+
+                    <button class="btn">
+                        <i class="bi bi-bell"></i>
+                    </button>
+
+                    <AccountDropdown />
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- Content -->
+        <main class="app-content">
+
+            <article class="content p-5">
+
+                @Body
+
+            </article>
+
+        </main>
+
+    </div>
+
 </div>
 
 @code {
