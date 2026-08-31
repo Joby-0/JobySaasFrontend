@@ -2,6 +2,9 @@
 @page "/"
 @using JobySaasFrontend.Components.Components
 @using Microsoft.AspNetCore.Authorization
+@inject OrganizationStateService OrganizationState
+@inject NavigationManager NavigationManager
+
 
 @rendermode InteractiveServer
 @attribute [Authorize]
@@ -59,10 +62,33 @@ JobySaasFrontend.Components.Components.VideoInListComponent.ContentStatus.Upload
     private record RecentContentItem(string Title, string Platform, string? ThumbnailUrl, DateTime PublishedAt,
 JobySaasFrontend.Components.Components.VideoInListComponent.ContentStatus Status);
 
-    [Parameter]
+[Parameter]
     public Guid? OrganizationId { get; set; }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        await OrganizationState.LoadAsync();
+
+        // User visited "/"
+        if (!OrganizationId.HasValue)
+        {
+            var organization = OrganizationState.CurrentOrganization;
+
+            if (organization != null)
+            {
+                NavigationManager.NavigateTo(
+                    $"/org/{organization.Id}",
+                    replace: true);
+                
+                return;
+            }
+
+            // No organization
+            // Navigate somewhere appropriate
+            return;
+        }
+
+        // User visited /org/{id}
+        // Load/use OrganizationId here...
     }
 }
