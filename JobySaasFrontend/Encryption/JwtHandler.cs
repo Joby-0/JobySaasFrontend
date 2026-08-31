@@ -1,16 +1,23 @@
 using System.Net.Http.Headers;
+using JobySaasFrontend.Data;
 using JobySaasFrontend.Encryption;
+using JobySaasFrontend.Models.DTO;
 using JobySaasFrontend.Services;
+using Microsoft.AspNetCore.Identity;
 
 public class JwtAuthHandler : DelegatingHandler
 {
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly Encryptions _encryptions;
+    private readonly JWTService _jwtService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public JwtAuthHandler(IHttpContextAccessor contextAccessor, Encryptions encryptions)
+    public JwtAuthHandler(IHttpContextAccessor contextAccessor, Encryptions encryptions, JWTService jwtSerivce, UserManager<ApplicationUser> userManager)
     {
         _contextAccessor = contextAccessor;
         _encryptions = encryptions;
+        _jwtService = jwtSerivce;
+        _userManager = userManager;
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -29,7 +36,7 @@ public class JwtAuthHandler : DelegatingHandler
         {
             try
             {
-                // jwtUserToken = await _apiTokenService.RenewAsync();
+                jwtUserToken = await RenewAsync();
             }
             catch
             {
@@ -45,5 +52,20 @@ public class JwtAuthHandler : DelegatingHandler
         }
 
         return await base.SendAsync(request, cancellationToken);
+    }
+
+    private async Task<JwtUserToken?> RenewAsync()
+    {
+        var httpContext = _contextAccessor.HttpContext;
+
+        if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            return null;
+
+        var user = await _userManager.GetUserAsync(httpContext.User);
+
+        if (user == null)
+            return null;
+
+        return await _jwtService.CreateJwtUserTokenAsync(user);
     }
 }

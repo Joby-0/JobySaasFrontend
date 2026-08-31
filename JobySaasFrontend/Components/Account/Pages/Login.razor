@@ -139,17 +139,8 @@
             Logger.LogInformation("User logged in.");
 
             var user = await UserManager.FindByEmailAsync(Input.Email);
-            var roles = await UserManager.GetRolesAsync(user);
 
-            var loginResponse = new LoginResponse
-            {
-                UserId = Guid.Parse(user.Id), // adjust if your ApplicationUser key isn't a Guid string
-                UserName = user.UserName,
-                UserRole = roles.FirstOrDefault() ?? "User",
-                Email = user.Email
-            };
-
-            var jwtUserToken = JwtService.CreateJwtUserToken(loginResponse);
+            var jwtUserToken = await JwtService.CreateJwtUserTokenAsync(user);
             var encryptedPayload = Encryptions.AesEncryptToBase64(jwtUserToken);
 
             HttpContext.Response.Cookies.Append("joby_api_token", encryptedPayload, new CookieOptions

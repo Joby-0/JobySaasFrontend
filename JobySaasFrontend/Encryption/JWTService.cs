@@ -5,16 +5,21 @@ using Microsoft.Extensions.Options;
 
 using JobySaasFrontend.Encryption.Options;
 using JobySaasFrontend.Models.DTO;
+using JobySaasFrontend.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace JobySaasFrontend.Encryption;
 
 public class JWTService
 {
     private readonly JwtOptions _jwtOptions;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public JWTService(IOptions<JwtOptions> jwtOptions)
+
+    public JWTService(IOptions<JwtOptions> jwtOptions,UserManager<ApplicationUser> userManager)
     {
         _jwtOptions = jwtOptions.Value;
+        _userManager = userManager;
     }
 
     //Create a list of claims to encrypt into the JWT token
@@ -35,8 +40,21 @@ public class JWTService
         return claims;
     }
 
-    public JwtUserToken CreateJwtUserToken(LoginResponse _usrSession)
+    public async Task<JwtUserToken?> CreateJwtUserTokenAsync(ApplicationUser? user)
     {
+        if (user == null)
+            return null;
+
+        var roles = await _userManager.GetRolesAsync(user);
+
+        var _usrSession = new LoginResponse
+        {
+            UserId = Guid.Parse(user.Id),
+            UserName = user.UserName,
+            UserRole = roles.FirstOrDefault() ?? "User",
+            Email = user.Email
+        };
+
         if (_usrSession == null) throw new ArgumentException($"{nameof(_usrSession)} cannot be null");
 
         var _userToken = new JwtUserToken();
