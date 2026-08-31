@@ -1,4 +1,5 @@
 @inherits LayoutComponentBase
+@using BlazorBootstrap
 @using JobySaasFrontend.Services
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -42,9 +43,8 @@
 
                 <!-- Right side -->
                 <div class="header-actions">
-
                     <button class="btn">
-                        <i class="bi bi-bell"></i>
+                        <Icon Name="IconName.Bell"/>
                     </button>
 
                     <AccountDropdown />

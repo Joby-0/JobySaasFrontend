@@ -1,101 +1,19 @@
-.app-sidebar {
-    width: 240px;
-    transition: width 220ms ease;
+::deep .sidebar-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.sidebar-link {
-    color: #000 !important;
+::deep .sidebar-link:hover {
+    background-color: #f5f5f5;
 }
 
-.sidebar-link:hover {
-    color: var(--bs-primary) !important;
-    background-color: rgba(var(--bs-primary-rgb), 0.08);
+::deep .sidebar-link.active {
+    color: var(--color-primary);
+    background-color: #f5f5f5;
+    font-weight: 600;
 }
 
-.sidebar-link.active {
-    color: var(--bs-primary) !important;
-    background-color: rgba(var(--bs-primary-rgb), 0.1);
-}
-
-.sidebar-link > :first-child {
-    width: 20px;
-    flex: 0 0 20px;
-    text-align: center;
-}
-
-.sidebar-navigation.is-collapsed {
-    width: 50px;
-}
-
-.sidebar-navigation.is-collapsed .sidebar-top {
-    justify-content: center !important;
-}
-
-.sidebar-navigation.is-collapsed .brand-label,
-.sidebar-navigation.is-collapsed .sidebar-link span {
+::deep .organization-selector::after{
     display: none;
-}
-
-.sidebar-navigation.is-collapsed .sidebar-link {
-    justify-content: center;
-    padding-right: 0 !important;
-    padding-left: 0 !important;
-}
-
-.account-menu {
-    margin-top: auto;
-}
-
-.account-menu summary {
-    list-style: none;
-    cursor: pointer;
-}
-
-.account-menu summary::-webkit-details-marker {
-    display: none;
-}
-
-.account-dropdown {
-    bottom: 100%;
-    display: block;
-    min-width: 170px;
-}
-
-.account-menu:not([open]) .account-dropdown {
-    display: none;
-}
-
-.app-sidebar:has(.sidebar-navigation.is-collapsed) .account-dropdown {
-    left: 34px !important;
-    bottom: 0;
-}
-
-.app-sidebar:has(.sidebar-navigation.is-collapsed) .account-menu summary {
-    justify-content: center;
-    padding-right: 0 !important;
-    padding-left: 0 !important;
-}
-
-.app-sidebar:has(.sidebar-navigation.is-collapsed) .account-menu summary .me-2 {
-    margin-right: 0 !important;
-}
-
-.app-sidebar:has(.sidebar-navigation.is-collapsed) .account-menu summary span:last-child {
-    display: none;
-}
-
-@media (max-width: 767.98px) {
-    .app-sidebar {
-        width: 210px;
-    }
-
-    .app-sidebar.is-collapsed {
-        width: 50px;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .app-sidebar {
-        transition: none;
-    }
 }

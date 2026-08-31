@@ -1,11 +1,65 @@
+@using Microsoft.AspNetCore.Identity
+@using JobySaasFrontend.Data
+
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 <div class="btn-group dropup">
-    <button type="button" class="btn dropdown-toggle bg-white text-start" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="bi bi-person-fill me-2" aria-hidden="true"></i>
-        <span>Account</span>
+
+    <button type="button" class="btn p-0 border-0 bg-transparent" data-bs-toggle="dropdown" aria-expanded="false">
+        @if (!string.IsNullOrEmpty(ProfileImageUrl))
+        {
+            <img src="@ProfileImageUrl" alt="Profile" class="profile-avatar rounded-circle" />
+        }
+        else
+        {
+            <div class="profile-avatar profile-placeholder rounded-circle">
+                @Letter
+            </div>
+        }
     </button>
+
     <ul class="dropdown-menu">
-        <a class="dropdown-item text-decoration-none" href="/Account">Account</a>
-        <a class="dropdown-item text-decoration-none" href="/pricing">Settings</a>
-        <LogoutForm />
+
+        <li>
+            <a class="dropdown-item text-decoration-none" href="/Account">
+                <i class="bi bi-person me-2"></i>
+                Account
+            </a>
+        </li>
+
+        <li>
+            <a class="dropdown-item text-decoration-none" href="/pricing">
+                <i class="bi bi-gear me-2"></i>
+                Settings
+            </a>
+        </li>
+
+        <li>
+            <LogoutForm />
+        </li>
+
     </ul>
+
 </div>
+
+@code {
+    private string? ProfileImageUrl;
+    private string? Letter;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var principal = authState.User;
+
+        if (principal.Identity?.IsAuthenticated == true)
+        {
+            var user = await UserManager.GetUserAsync(principal);
+
+            ProfileImageUrl = user?.ProfileImageUrl;
+            if (string.IsNullOrWhiteSpace(ProfileImageUrl))
+            {
+                Letter = user?.UserName?.FirstOrDefault().ToString().ToUpper() ?? "?";
+            }
+        }
+    }
+}

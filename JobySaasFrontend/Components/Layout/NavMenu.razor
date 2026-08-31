@@ -7,15 +7,15 @@
 
 <div class="sidebar-navigation @(IsCollapsed ? "is-collapsed" : "") d-flex flex-column flex-grow-1">
     <div class="sidebar-top d-flex align-items-center justify-content-between mb-2">
-        <Dropdown Class="mb-4 p-0 w-100">
+        <Dropdown Class="mb-4 p-0 w-100 px-2">
 
-            <DropdownToggleButton class="organization-selector d-flex p-0 pb-2">
-                <div class="me-3 organization-icon">
-                    <Icon Name="IconName.People" />
-                </div>
+            <DropdownToggleButton class="organization-selector d-flex justify-content-between p-0 pb-2">
 
-                <div class="organization-info me-2">
-
+                
+                <div class="organization-info me-2 d-flex">
+                    <div class="me-3 organization-icon">
+                        <Icon Name="IconName.People" />
+                    </div>
                     <span class="organization-name">
                         @(OrganizationState.CurrentOrganization?.Name ?? "Select organization")
                     </span>
@@ -37,7 +37,7 @@
 
                             <span>@organization.Name</span>
 
-                            @if (SelectedOrganization?.Id == organization.Id)
+                            @if (OrganizationState.CurrentOrganization?.Id == organization.Id)
                             {
                                 <i class="bi bi-check ms-auto"></i>
                             }
@@ -50,33 +50,94 @@
             </DropdownMenu>
 
         </Dropdown>
-
-       
     </div>
 
 
 
     <nav class="sidebar-nav d-flex flex-column flex-grow-1" aria-label="Main navigation">
-        <NavLink href="@GetOrgUrl("")" Match="NavLinkMatch.All" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Home">
-            <Icon Name="IconName.HouseFill" class="me-3" />
-            <span>Home</span>
-        </NavLink>
-        <NavLink href="@GetOrgUrl("videos")" Match="NavLinkMatch.All" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Video">
-            <Icon Name="IconName.CameraVideo" class="me-3" />
-            <span>Vidoes</span>
-        </NavLink>
-        <NavLink href="@GetOrgUrl("social-accounts")" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Pricing">
-            <Icon Name="IconName.GearFill" class="me-3" />
-            <span>Social accounts</span>
-        </NavLink>
-        <NavLink href="@GetOrgUrl("dashboard")" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Dashboard">
-            <Icon Name="IconName.GridFill" class="me-3" />
-            <span>Dashboard</span>
-        </NavLink>
-        <NavLink  href="@GetOrgUrl("organisation")" class="sidebar-link d-flex align-items-center py-2 rounded text-dark text-decoration-none" title="Organisation">
-            <Icon Name="IconName.People" class="me-3" />
-            <span>Organisation</span>
-        </NavLink>
+
+        <!-- GENERAL -->
+        <div class="">
+
+            <div class="text-muted small px-2 mb-2">
+                GENERAL
+            </div>
+
+            <NavLink href="@GetOrgUrl("")" Match="NavLinkMatch.All"
+                     class="sidebar-link d-flex align-items-center py-2 px-2 rounded text-dark text-decoration-none">
+
+                <Icon Name="IconName.HouseFill" class="me-3" />
+
+                <span>Home</span>
+
+            </NavLink>
+
+            <NavLink href="@GetOrgUrl("social-accounts")"
+                     class="sidebar-link d-flex align-items-center py-2 px-2 rounded text-dark text-decoration-none">
+
+                <Icon Name="IconName.Person" class="me-3" />
+
+                <span>Social accounts</span>
+
+            </NavLink>
+
+            <NavLink href="@GetOrgUrl("dashboard")"
+                     class="sidebar-link d-flex align-items-center py-2 px-2 rounded text-dark text-decoration-none">
+
+                <Icon Name="IconName.GridFill" class="me-3" />
+
+                <span>Dashboard</span>
+
+            </NavLink>
+
+            <NavLink href="@GetOrgUrl("organisation")"
+                     class="sidebar-link d-flex align-items-center py-2 px-2 rounded text-dark text-decoration-none">
+
+                <Icon Name="IconName.People" class="me-3" />
+
+                <span>Organisation</span>
+
+            </NavLink>
+
+        </div>
+
+        <div class="border-bottom my-4"></div>
+        <!-- TOOLS -->
+        <div class="">
+
+            <div class="text-muted small px-2 mb-2">
+                TOOLS
+            </div>
+
+            <NavLink href="@GetOrgUrl("videos")" class="sidebar-link d-flex align-items-center py-2 px-2 rounded text-dark text-decoration-none">
+
+                <Icon Name="IconName.CameraVideo" class="me-3" />
+
+                <span>Videos</span>
+
+            </NavLink>
+
+        </div>
+
+        <div class="border-bottom my-4"></div>
+
+        <!-- SUPPORT -->
+        <div>
+
+            <div class="text-muted small px-2 mb-2">
+                SUPPORT
+            </div>
+
+            <NavLink href="@GetOrgUrl("help")" class="sidebar-link d-flex align-items-center py-2 px-2 rounded text-dark text-decoration-none">
+
+                <Icon Name="IconName.QuestionCircle" class="me-3" />
+
+                <span>Help</span>
+
+            </NavLink>
+
+        </div>
+
     </nav>
 </div>
 
@@ -90,7 +151,6 @@
     private Task ToggleSidebar() => IsCollapsedChanged.InvokeAsync(!IsCollapsed);
 
     private List<OrganizationDto> Organizations { get; set; } = new();
-    private OrganizationDto? SelectedOrganization { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -98,7 +158,6 @@
     }
     private void SelectOrganization(OrganizationDto organization)
     {
-        SelectedOrganization = organization;
         OrganizationState.SetCurrentOrganization(organization);
 
         NavigationManager.NavigateTo($"/{organization.Id}/");
