@@ -75,3 +75,6 @@
 ::deep .action-button::after{
     display: none;
 }
+.filter-btn:hover{
+    background-color: var(--color-hover);
+}

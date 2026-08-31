@@ -17,3 +17,7 @@
 ::deep .organization-selector::after{
     display: none;
 }
+
+::deep .organization-selector:hover{
+    background-color: var(--color-hover);
+}

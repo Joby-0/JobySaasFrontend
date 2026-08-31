@@ -13,27 +13,28 @@
 
 <div class="container">
     <div class="options-bar d-flex justify-content-between">
-        <div class="search-div">
+        <div class="search-div d-flex">
 
-            <div class="search-bar">
-                <input class="form-control" type="search" placeholder="Search social accounts..." @bind="SearchTerm"
+            <div class="search-bar me-2">
+                <input class="form-control" type="search" placeholder="Search" @bind="SearchTerm"
                        @bind:event="oninput" />
             </div>
 
-            <button class="btn filter-btn" type="button" @onclick="ToggleFilters">
-                <Icon Name="IconName.Filter" />
-            </button>
+            <div class="mb-3">
+
+                <button class="btn filter-btn border" type="button" @onclick="ToggleFilters">
+
+                    <Icon Name="IconName.Filter" class="me-2" />
+
+                    Filter
+
+                </button>
+
+
+            </div>
 
         </div>
 
-        @if (ShowFilters)
-        {
-            <div class="filter-bar">
-
-                
-
-            </div>
-        }
         <div>
             <button class="btn btn-outline-primary">Manage accounts</button>
             <button class="btn btn-third" @onclick="OpenAddModal">
@@ -41,6 +42,51 @@
             </button>
         </div>
     </div>
+
+    @if (ShowFilters)
+    {
+        <div class="filter-bar border rounded mt-2 p-4">
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Platform
+                    </label>
+
+                    <select class="form-select">
+                        <option>All platforms</option>
+                        <option>YouTube</option>
+                        <option>Instagram</option>
+                        <option>TikTok</option>
+                        <option>Facebook</option>
+                    </select>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Status
+                    </label>
+
+                    <select class="form-select">
+                        <option>All statuses</option>
+                        <option>Connected</option>
+                        <option>Expired</option>
+                        <option>Error</option>
+                    </select>
+
+                </div>
+
+
+            </div>
+
+        </div>
+    }
+
+            
 
     <div class="list">
         @if (isLoading)
@@ -53,7 +99,7 @@
         }
         else
         {
-            <div class="">
+            <div class="mt-5">
 
                 <div class="social-accounts-list">
 
@@ -93,7 +139,7 @@
 
                                 <Tooltip Color="TooltipColor.Secondary" Title="@GetStatusText(account.Status)">
 
-                                    <span class="status-dot d-inline-block rounded-circle @GetStatusClass(account.Status)"/>
+                                    <span class="status-dot d-inline-block rounded-circle @GetStatusClass(account.Status)" />
 
                                 </Tooltip>
 
