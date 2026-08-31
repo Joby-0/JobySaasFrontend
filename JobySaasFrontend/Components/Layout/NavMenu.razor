@@ -99,6 +99,7 @@
     private void SelectOrganization(OrganizationDto organization)
     {
         SelectedOrganization = organization;
+        OrganizationState.SetCurrentOrganization(organization);
 
         NavigationManager.NavigateTo($"/{organization.Id}/");
     }

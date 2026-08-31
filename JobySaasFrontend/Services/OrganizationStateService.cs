@@ -41,4 +41,8 @@ public class OrganizationStateService
 
         CurrentOrganization = organization;
     }
+    public void SetCurrentOrganization(OrganizationDto organization)
+    {
+        CurrentOrganization = organization;
+    }
 }
