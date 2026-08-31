@@ -53,38 +53,160 @@
         }
         else
         {
-            // vill man ha en header på listan med vad varje fät är typ eller några kanske typ subs last sync och platform kanske 
-            @foreach (var account in accounts)
-            {
-                <div class="d-flex align-items-center justify-content-between border-bottom py-2">
-                    <div>
-                        <Tooltip Color="TooltipColor.Secondary" Title="status">
-                            <div class="dot">.</div>
-                        </Tooltip>
-                    </div>
-                    <div class="d-flex align-items-center gap-3">
-                        <img src="@account.ProfileImageUrl" alt="@account.AccountName" class="profile-pic rounded-circle" />
-                        <div>
-                            <div class="fw-semibold">@account.AccountName</div>
-                            <div class="text-muted small">@account.AccountName</div>
-                        </div>
-                    </div>
-                    <div>
-                        <span>Followers/subs</span>
-                    </div>
-                    <div class="d-flex">
-                        <div class="d-block">
-                            <span class="fw-semibold">Last sync</span>
-                            <span class="text-muted small">last sync</span>
+            <div class="">
+
+                <div class="social-accounts-list">
+
+                    <!-- Header -->
+                    <div class="d-flex align-items-center px-3 py-2 text-muted small fw-semibold">
+
+                        <div class="account-status-column"></div>
+
+                        <div class="account-main-column">
+                            ACCOUNT
                         </div>
 
+                        <div class="account-stat-column">
+                            FOLLOWERS
+                        </div>
+
+                        <div class="account-sync-column">
+                            LAST SYNC
+                        </div>
+
+                        <div class="account-platform-column">
+                            PLATFORM
+                        </div>
+
+                        <div class="account-action-column"></div>
+
                     </div>
-                    <div>
-                        <button class="btn">Show more</button>
-                        @* eller vill man ha en liten meny som dycker på på tre ... *@
-                    </div>
+
+
+                    <!-- Accounts -->
+                    @foreach (var account in accounts)
+                    {
+                        <div class="d-flex align-items-center p-3  account-row account-row rounded-2">
+
+                            <!-- Status -->
+                            <div class="account-status-column">
+
+                                <Tooltip Color="TooltipColor.Secondary" Title="@GetStatusText(account.Status)">
+
+                                    <span class="status-dot d-inline-block rounded-circle @GetStatusClass(account.Status)"/>
+
+                                </Tooltip>
+
+                            </div>
+
+
+                            <!-- Account -->
+                            <div class="account-main-column">
+
+                                <div class="d-flex align-items-center gap-3">
+
+                                    <img src="@account.ProfileImageUrl" alt="@account.AccountName"
+                                         class="profile-pic rounded-circle" />
+
+                                    <div class="min-width-0">
+
+                                        <div class="fw-semibold text-dark text-truncate">
+                                            @account.AccountName
+                                        </div>
+
+                                        <div class="text-muted small text-truncate">
+                                            @account.CostumUrl
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Followers -->
+                            <div class="account-stat-column">
+
+                                <span class="fw-semibold">
+                                    @account.Followers
+                                </span>
+
+                            </div>
+
+
+                            <!-- Last sync -->
+                            <div class="account-sync-column">
+
+                                <div class="d-flex flex-column">
+
+                                    <span class="fw-semibold small">
+                                        @account.LastSync.ToShortTimeString()
+                                    </span>
+
+                                    <span class="text-muted small">
+                                        Synced
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Platform -->
+                            <div class="account-platform-column">
+
+                                <span class="badge platform-badge">
+                                    @account.Platform.ToString()
+                                </span>
+
+                            </div>
+
+
+                            <!-- Actions -->
+                            <div class="account-action-column">
+
+                                <Dropdown>
+
+                                    <DropdownToggleButton Color="ButtonColor.None" class="action-button">
+
+                                        <i class="bi bi-three-dots"></i>
+
+                                    </DropdownToggleButton>
+
+                                    <DropdownMenu Alignment="DropdownMenuAlignment.End">
+
+                                        <DropdownItem>
+                                            <i class="bi bi-eye me-2"></i>
+                                            View account
+                                        </DropdownItem>
+
+                                        <DropdownItem>
+                                            <i class="bi bi-arrow-repeat me-2"></i>
+                                            Sync now
+                                        </DropdownItem>
+
+                                        <DropdownItem>
+                                            <i class="bi bi-pencil me-2"></i>
+                                            Edit
+                                        </DropdownItem>
+
+                                        <DropdownItem>
+                                            <i class="bi bi-x-circle me-2"></i>
+                                            Disconnect
+                                        </DropdownItem>
+
+                                    </DropdownMenu>
+
+                                </Dropdown>
+
+                            </div>
+
+                        </div>
+                    }
+
                 </div>
-            }
+            </div>
         }
     </div>
 </div>
@@ -149,5 +271,29 @@
         var authUrl = await YoutubeApi.GetConnectUrlAsync(OrganizationId);
 
         NavigationManager.NavigateTo(authUrl, forceLoad: true);
+    }
+
+    private string GetStatusClass(SocialAccountStatus status)
+    {
+        return status switch
+        {
+            SocialAccountStatus.Connected => "status-connected",
+            SocialAccountStatus.Expired => "status-expired",
+            SocialAccountStatus.Error => "status-error",
+            SocialAccountStatus.Disconnected => "status-disconnected",
+            _ => "status-unknown"
+        };
+    }
+
+    private string GetStatusText(SocialAccountStatus status)
+    {
+        return status switch
+        {
+            SocialAccountStatus.Connected => "Connected",
+            SocialAccountStatus.Expired => "Connection expired",
+            SocialAccountStatus.Error => "Connection error",
+            SocialAccountStatus.Disconnected => "Disconnected",
+            _ => "Unknown status"
+        };
     }
 }
