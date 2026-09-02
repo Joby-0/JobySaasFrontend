@@ -12,7 +12,7 @@ public class OrganizationApiClient : IOrganizationApiClient
 
     public async Task<OrganizationDto> CreateOrganizationAsync(CreateOrganizationRequest request)
     {
-        var response = await _http.PostAsJsonAsync("api/Organization/CreateOrganization", request);
+        var response = await _http.PostAsJsonAsync("api/Organization/create", request);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<OrganizationDto>() ?? throw new InvalidOperationException("API returned an empty response for CreateOrganization.");
@@ -20,7 +20,7 @@ public class OrganizationApiClient : IOrganizationApiClient
 
     public async Task<ServiceResult<List<OrganizationMemberDTO>>> GetMembersAsync(Guid organizationId)
     {
-        var response = await _http.GetAsync($"api/Organization{organizationId}/members");
+        var response = await _http.GetAsync($"api/Organization/{organizationId}/members");
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<ServiceResult<List<OrganizationMemberDTO>>>();
     }
@@ -34,7 +34,7 @@ public class OrganizationApiClient : IOrganizationApiClient
 
     public async Task<OrganizationDto?> GetOrganizationAsync(Guid organizationId)
     {
-        var response = await _http.PostAsync($"api/Organization/GetOrganization/{organizationId}", null);
+        var response = await _http.GetAsync($"api/Organization/{organizationId}");
 
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
@@ -45,7 +45,7 @@ public class OrganizationApiClient : IOrganizationApiClient
 
     public async Task<ServiceResult<string>> RemoveMemberAsync(Guid organizationId, Guid userId)
     {
-        var response = await _http.DeleteAsync("api/Organization/{organizationId}/members/{userId}/remove");
+        var response = await _http.DeleteAsync($"api/Organization/{organizationId}/members/{userId}/remove");
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<ServiceResult<string>>();
     }
