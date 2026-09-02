@@ -1,0 +1,101 @@
+@using BlazorBootstrap
+@using JobySaasFrontend.Components.Components
+<div class="container">
+    <div class="options-bar d-flex justify-content-between">
+        <div class="search-div d-flex">
+
+            <div class="search-bar me-2">
+                <input class="form-control" type="search" placeholder="Search" @bind="SearchTerm"
+                       @bind:event="oninput" />
+            </div>
+
+            <div class="mb-3">
+
+                <button class="btn filter-btn border" type="button" @onclick="ToggleFilters">
+                    <Icon Name="IconName.Filter" class="me-2" />
+                    Filter
+                </button>
+
+
+            </div>
+
+        </div>
+
+        <div>
+            <button class="btn btn-outline-primary">Manage Videos</button>
+            <button class="btn btn-third">
+                <Icon Name="IconName.Plus" /> Upload
+            </button>
+        </div>
+    </div>
+
+    @if (ShowFilters)
+    {
+        <div class="filters-bar d-flex justify-content-between">
+            <div class="filter-item">
+                <label for="platformFilter" class="form-label">Platform</label>
+                <select class="form-select" id="platformFilter">
+                    <option value="">All</option>
+                    <option value="YouTube">YouTube</option>
+                    <option value="TikTok">TikTok</option>
+                    <option value="Instagram">Instagram</option>
+                </select>
+            </div>
+
+            <div class="filter-item">
+                <label for="statusFilter" class="form-label">Status</label>
+                <select class="form-select" id="statusFilter">
+                    <option value="">All</option>
+                    <option value="Uploading">Uploading</option>
+                    <option value="Uploaded">Uploaded</option>
+                    <option value="Error">Error</option>
+                    <option value="Waiting">Waiting</option>
+                </select>
+            </div>
+
+            <div class="filter-item">
+                <label for="dateFilter" class="form-label">Date</label>
+                <input type="date" class="form-control" id="dateFilter" />
+            </div>
+
+        </div>
+    }
+    <div class="list">
+        <div class="d-flex">
+            <div class="thumbnail">
+                <img />
+            </div>
+            <div>
+                <div class="title"></div>
+                <div class="description"></div>
+                <div class="upload-date"></div>
+            </div>
+            <div>
+                <div class="status"></div>
+                <div class="d-flex platform-list"> 
+                    <PlatformIcon Platform="YouTube" />
+                    <PlatformIcon Platform="TikTok" />
+                    <PlatformIcon Platform="Instagram" />
+                </div>
+                <div class="nr-of-accounts"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    private string SearchTerm = "";
+    private bool ShowFilters = false;
+    private void Search(ChangeEventArgs e)
+    {
+        // Search logic later
+    }
+
+    private void ToggleFilters()
+    {
+        ShowFilters = !ShowFilters;
+    }
+}

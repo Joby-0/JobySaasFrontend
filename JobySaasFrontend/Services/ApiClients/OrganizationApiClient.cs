@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using JobySaasFrontend.Models;
 using JobySaasFrontend.Models.DTO;
 namespace JobySaasFrontend.Services;
 
@@ -15,6 +16,13 @@ public class OrganizationApiClient : IOrganizationApiClient
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<OrganizationDto>() ?? throw new InvalidOperationException("API returned an empty response for CreateOrganization.");
+    }
+
+    public async Task<ServiceResult<List<OrganizationMemberDTO>>> GetMembersAsync(Guid organizationId)
+    {
+        var response = await _http.GetAsync($"api/Organization{organizationId}/members");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<ServiceResult<List<OrganizationMemberDTO>>>();
     }
 
     public async Task<List<OrganizationDto>> GetMyOrganizationsAsync()
@@ -33,5 +41,12 @@ public class OrganizationApiClient : IOrganizationApiClient
 
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<OrganizationDto>();
+    }
+
+    public async Task<ServiceResult<string>> RemoveMemberAsync(Guid organizationId, Guid userId)
+    {
+        var response = await _http.DeleteAsync("api/Organization/{organizationId}/members/{userId}/remove");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<ServiceResult<string>>();
     }
 }

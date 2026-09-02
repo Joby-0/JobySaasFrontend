@@ -11,6 +11,13 @@ public class InvitationApiClient : IInvitationApiClient
 
     public InvitationApiClient(HttpClient http) => _http = http;
 
+    public async Task<ServiceResult<bool>> AcceptInviteAsync(string code)
+    {
+        var response = await _http.GetAsync($"api/Invitation/accept?code{code}");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<ServiceResult<bool>>();
+    }
+
     public async Task<ServiceResult<string>> CreateInviteCodeAsync(Guid organizationId, int expireInMinutes)
     {
         var response = await _http.PostAsync(
@@ -28,4 +35,6 @@ public class InvitationApiClient : IInvitationApiClient
         var result = await response.Content.ReadFromJsonAsync<ServiceResult<InvitationPreviewDto>>();
         return result ?? new ServiceResult<InvitationPreviewDto> { Success = false, ErrorMessage = "Empty response from API." };
     }
+
+    
 }
