@@ -1,5 +1,11 @@
+@page "/org/{organizationId:guid}/videos"
+@rendermode InteractiveServer
 @using BlazorBootstrap
+@using JobySaasFrontend.Models.DTO
 @using JobySaasFrontend.Components.Components
+@using JobySaasFrontend.Services
+@inject IMediaApiClient MediaApiClient
+
 <div class="container">
     <div class="options-bar d-flex justify-content-between">
         <div class="search-div d-flex">
@@ -16,7 +22,6 @@
                     Filter
                 </button>
 
-
             </div>
 
         </div>
@@ -31,64 +36,233 @@
 
     @if (ShowFilters)
     {
-        <div class="filters-bar d-flex justify-content-between">
-            <div class="filter-item">
-                <label for="platformFilter" class="form-label">Platform</label>
-                <select class="form-select" id="platformFilter">
-                    <option value="">All</option>
-                    <option value="YouTube">YouTube</option>
-                    <option value="TikTok">TikTok</option>
-                    <option value="Instagram">Instagram</option>
-                </select>
-            </div>
+        <div class="filter-bar border rounded mt-2 p-4">
 
-            <div class="filter-item">
-                <label for="statusFilter" class="form-label">Status</label>
-                <select class="form-select" id="statusFilter">
-                    <option value="">All</option>
-                    <option value="Uploading">Uploading</option>
-                    <option value="Uploaded">Uploaded</option>
-                    <option value="Error">Error</option>
-                    <option value="Waiting">Waiting</option>
-                </select>
-            </div>
+            <div class="row g-3">
 
-            <div class="filter-item">
-                <label for="dateFilter" class="form-label">Date</label>
-                <input type="date" class="form-control" id="dateFilter" />
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Platform
+                    </label>
+
+                    <select class="form-select">
+                        <option>All platforms</option>
+                        <option>YouTube</option>
+                        <option>Instagram</option>
+                        <option>TikTok</option>
+                        <option>Facebook</option>
+                    </select>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Status
+                    </label>
+
+                    <select class="form-select">
+                        <option>All statuses</option>
+                        <option>Uploading</option>
+                        <option>Uploaded</option>
+                        <option>Error</option>
+                        <option>Waiting</option>
+                    </select>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Date
+                    </label>
+
+                    <input type="date" class="form-control" />
+
+                </div>
+
             </div>
 
         </div>
     }
-    <div class="list">
-        <div class="d-flex">
-            <div class="thumbnail">
-                <img />
-            </div>
-            <div>
-                <div class="title"></div>
-                <div class="description"></div>
-                <div class="upload-date"></div>
-            </div>
-            <div>
-                <div class="status"></div>
-                <div class="d-flex platform-list"> 
-                    <PlatformIcon Platform="YouTube" />
-                    <PlatformIcon Platform="TikTok" />
-                    <PlatformIcon Platform="Instagram" />
-                </div>
-                <div class="nr-of-accounts"></div>
-            </div>
 
-        </div>
+    <div class="list">
+        @if (isLoading)
+        {
+            <div class="text-center py-4"><span class="spinner-border spinner-border-sm"></span></div>
+        }
+        else if (videos.Count == 0)
+        {
+            <p class="text-muted text-center py-4">No videos uploaded yet.</p>
+        }
+        else
+        {
+            <div class="mt-5">
+
+                <div class="videos-list">
+
+                    <!-- Header -->
+                    <div class="d-flex align-items-center px-3 py-2 text-muted small fw-semibold">
+
+                        <div class="video-status-column"></div>
+
+                        <div class="video-main-column">
+                            VIDEO
+                        </div>
+
+                        <div class="video-date-column">
+                            UPLOADED
+                        </div>
+
+                        <div class="video-platform-column">
+                            PLATFORMS
+                        </div>
+
+                        <div class="video-accounts-column">
+                            ACCOUNTS
+                        </div>
+
+                        <div class="video-action-column"></div>
+
+                    </div>
+
+                    <!-- Videos -->
+                    @foreach (var video in videos)
+                    {
+                        <div class="d-flex align-items-center p-3 video-row rounded-2">
+
+                            <!-- Status -->
+                            <div class="video-status-column">
+
+                                @* <Tooltip Color="TooltipColor.Secondary" Title="@GetStatusText(video.Status)">
+
+                                    <span class="status-dot d-inline-block rounded-circle @GetStatusClass(video.Status)" />
+
+                                </Tooltip> *@
+
+                            </div>
+
+                            <!-- Video -->
+                            <div class="video-main-column">
+
+                                <div class="d-flex align-items-center gap-3">
+
+                                    <img src="@video.ThumbnailUrl" alt="@video.Title"
+                                         class="thumbnail-pic rounded-2" />
+
+                                    <div class="min-width-0">
+
+                                        <div class="fw-semibold text-dark text-truncate">
+                                            @video.Title
+                                        </div>
+
+                                        <div class="text-muted small text-truncate">
+                                            @video.Description
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Uploaded -->
+                            <div class="video-date-column">
+
+                                <div class="d-flex flex-column">
+
+                                    <span class="fw-semibold small">
+                                        @video.CreatedAt.ToShortDateString()
+                                    </span>
+
+                                    <span class="text-muted small">
+                                        Uploaded
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Platforms -->
+                            <div class="video-platform-column">
+
+                                <div class="d-flex platform-list gap-1">
+                                    @foreach (var platform in video.SocialPlatforms)
+                                    {
+                                        <PlatformIcon Platform="@platform.ToString()" />
+                                    }
+                                </div>
+
+                            </div>
+
+                            <!-- Accounts -->
+                            <div class="video-accounts-column">
+
+                                <span class="badge platform-badge">
+                                    @video.SocialAccountCount account(s)
+                                </span>
+
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="video-action-column">
+
+                                <Dropdown>
+
+                                    <DropdownToggleButton Color="ButtonColor.None" class="action-button">
+
+                                        <i class="bi bi-three-dots"></i>
+
+                                    </DropdownToggleButton>
+
+                                    <DropdownMenu Alignment="DropdownMenuAlignment.End">
+
+                                        <DropdownItem>
+                                            <i class="bi bi-eye me-2"></i>
+                                            View video
+                                        </DropdownItem>
+
+                                        <DropdownItem>
+                                            <i class="bi bi-arrow-repeat me-2"></i>
+                                            Retry upload
+                                        </DropdownItem>
+
+                                        <DropdownItem>
+                                            <i class="bi bi-pencil me-2"></i>
+                                            Edit
+                                        </DropdownItem>
+
+                                        <DropdownItem>
+                                            <i class="bi bi-trash me-2"></i>
+                                            Delete
+                                        </DropdownItem>
+
+                                    </DropdownMenu>
+
+                                </Dropdown>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+            </div>
+        }
     </div>
 </div>
 
-
-
 @code {
+    [Parameter]
+    public Guid organizationId { get; set; }
+
+    private List<MediaListDto> videos = [];
+    private bool isLoading = true;
+
     private string SearchTerm = "";
     private bool ShowFilters = false;
+
     private void Search(ChangeEventArgs e)
     {
         // Search logic later
@@ -98,4 +272,37 @@
     {
         ShowFilters = !ShowFilters;
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // TODO: replace with real API call, e.g.:
+        var result = await MediaApiClient.GetMediaListAsync(organizationId, 1, 10);
+        if (result.Success) videos = result.Data;
+
+        isLoading = false;
+    }
+
+    @* private string GetStatusClass(VideoStatus status)
+    {
+        return status switch
+        {
+            VideoStatus.Uploaded => "status-connected",
+            VideoStatus.Uploading => "status-uploading",
+            VideoStatus.Error => "status-error",
+            VideoStatus.Waiting => "status-disconnected",
+            _ => "status-unknown"
+        };
+    }
+
+    private string GetStatusText(VideoStatus status)
+    {
+        return status switch
+        {
+            VideoStatus.Uploaded => "Uploaded",
+            VideoStatus.Uploading => "Uploading",
+            VideoStatus.Error => "Upload error",
+            VideoStatus.Waiting => "Waiting to upload",
+            _ => "Unknown status"
+        };
+    } *@
 }

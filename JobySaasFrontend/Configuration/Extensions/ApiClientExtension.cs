@@ -17,6 +17,7 @@ public static class ApiClientExtensions
         services.AddApiClient<IYoutubeApiClient, YoutubeApiClient>(apiBaseUrl);
         services.AddApiClient<IInvitationApiClient, InvitationApiClient>(apiBaseUrl);
         services.AddApiClient<ISocialAccountApiClient, SocialAccountApiClient>(apiBaseUrl);
+        services.AddApiClient<IMediaApiClient, MediaApiClient>(apiBaseUrl);
 
         return services;
     }
