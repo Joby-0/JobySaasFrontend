@@ -13,8 +13,7 @@ public class MediaApiClient : IMediaApiClient
 
     public async Task<ServiceResult<List<MediaListDto>>> GetMediaListAsync(Guid organizationId, int pageNumber, int pageSize)
     {
-        var response = await _http.GetAsync(
-            $"api/Media/{organizationId}/list?pageNumber={pageNumber}&pageSize={pageSize}");
+        var response = await _http.GetAsync($"api/Media/{organizationId}/list?pageNumber={pageNumber}&pageSize={pageSize}");
 
         var result = await response.Content.ReadFromJsonAsync<ServiceResult<List<MediaListDto>>>();
         return result ?? new ServiceResult<List<MediaListDto>> { Success = false, ErrorMessage = "Empty response from API." };

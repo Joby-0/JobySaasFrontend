@@ -80,3 +80,16 @@
 .filter-btn:hover {
     background-color: var(--color-hover);
 }
+
+
+.account-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 6px;
+    background: #eee; /* shows while loading or if the image 404s */
+}
+::deep .modal-body{
+    min-height: 400px;
+}

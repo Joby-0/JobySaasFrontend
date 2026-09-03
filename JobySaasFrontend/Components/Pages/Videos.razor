@@ -4,7 +4,9 @@
 @using JobySaasFrontend.Models.DTO
 @using JobySaasFrontend.Components.Components
 @using JobySaasFrontend.Services
+@using JobySaasFrontend.Models
 @inject IMediaApiClient MediaApiClient
+@inject ISocialAccountApiClient SocialAccountApiClient
 
 <div class="container">
     <div class="options-bar d-flex justify-content-between">
@@ -28,7 +30,7 @@
 
         <div>
             <button class="btn btn-outline-primary">Manage Videos</button>
-            <button class="btn btn-third">
+            <button class="btn btn-third" @onclick="OpenUploadModal">
                 <Icon Name="IconName.Plus" /> Upload
             </button>
         </div>
@@ -148,8 +150,7 @@
 
                                 <div class="d-flex align-items-center gap-3">
 
-                                    <img src="@video.ThumbnailUrl" alt="@video.Title"
-                                         class="thumbnail-pic rounded-2" />
+                                    <img src="@video.ThumbnailUrl" alt="@video.Title" class="thumbnail-pic rounded-2" />
 
                                     <div class="min-width-0">
 
@@ -251,17 +252,306 @@
             </div>
         }
     </div>
+    <Modal @ref="uploadModal" Title=""  >
+
+        <BodyTemplate>
+
+            @if (isProcessing)
+            {
+                <div class="text-center py-5">
+                    <div class="spinner-border mb-3"></div>
+
+                    <h5>@processingMessage</h5>
+
+                    <p class="text-muted mb-0">
+                        This may take a moment.
+                    </p>
+                </div>
+            }
+            else
+            {
+                @if (currentStep == 1)
+                {
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Video file</label>
+
+                        <InputFile class="form-control" OnChange="HandleFileSelected" accept="video/*" />
+
+                        @if (selectedFile is not null)
+                        {
+                            <div class="form-text">
+                                @selectedFile.Name
+                                (@FormatFileSize(selectedFile.Size))
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Title</label>
+                        <input class="form-control" @bind="title" placeholder="Give your video a title" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Description</label>
+                        <textarea class="form-control" rows="3" @bind="description" placeholder="Optional description">
+                </textarea>
+                    </div>
+                }
+                else if (currentStep == 2)
+                {
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold mb-0">Publish to</label>
+
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+
+                            @if (!isLoadingAccounts && accounts.Count > 0)
+                            {
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="checkbox" id="select-all-accounts" checked="@allSelected"
+                                           @onchange="(e) => ToggleAll((bool)e.Value!)" />
+                                    <label class="form-check-label small text-muted" for="select-all-accounts">
+                                        Select all
+                                    </label>
+                                </div>
+                            }
+                        </div>
+
+                        @if (isLoadingAccounts)
+                        {
+                            <div class="text-muted small">Loading accounts...</div>
+                        }
+                        else if (accounts.Count == 0)
+                        {
+                            <div class="text-muted small">No connected accounts yet.</div>
+                        }
+                        else
+                        {
+                            @foreach (var account in accounts)
+                            {
+                                <div class="form-check account-row">
+                                    <input class="form-check-input" type="checkbox" id="@("account-" + account.Id)"
+                                           checked="@selectedAccountIds.Contains(account.Id)"
+                                           @onchange="(e) => ToggleAccount(account.Id, (bool)e.Value!)" />
+                                    <label class="form-check-label d-flex align-items-center" for="@("account-" + account.Id)">
+                                        <PlatformIcon Platform="@account.Platform.ToString()" />
+                                        <img src="@(account.ProfileImageUrl ?? "/img/default-avatar.png")" class="account-avatar ms-2"
+                                             alt="" />
+
+                                        <span class="ms-2 fw-semibold">@account.AccountName</span>
+                                        <span class="text-muted small ms-2">@account.CustomUrl</span>
+                                    </label>
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+                else if (currentStep == 3)
+                {
+                    // Step 3
+                }
+                else if (currentStep == 4)
+                {
+                    // Step 4
+                }
+            }
+
+        </BodyTemplate>
+
+        <FooterTemplate>
+
+            @if (currentStep == 1)
+            {
+                <button class="btn btn-link text-muted" @onclick="CloseUploadModal">
+                    Cancel
+                </button>
+
+                <button class="btn btn-secondary" @onclick="ContinueToAccounts"
+                        disabled="@(selectedFile is null || string.IsNullOrWhiteSpace(title))">
+                    Continue
+                </button>
+            }
+
+            else if (currentStep == 2)
+            {
+                <button class="btn btn-link text-muted" @onclick="PreviousStep">
+                    Back
+                </button>
+
+                <button class="btn btn-secondary" @onclick="ContinueToPublish" disabled="@(selectedAccountIds.Count == 0)">
+                    Continue
+                </button>
+            }
+
+            else if (currentStep == 3)
+            {
+                <button class="btn btn-link text-muted" @onclick="PreviousStep">
+                    Back
+                </button>
+
+                <button class="btn btn-secondary" @onclick="Publish" disabled="@isProcessing">
+                    Publish
+                </button>
+            }
+
+            else if (currentStep == 4)
+            {
+                <button class="btn btn-secondary" @onclick="CloseUploadModal">
+                    Done
+                </button>
+            }
+
+        </FooterTemplate>
+
+    </Modal>
 </div>
+
 
 @code {
     [Parameter]
     public Guid organizationId { get; set; }
-
+    [Parameter] public EventCallback OnUploaded { get; set; }
     private List<MediaListDto> videos = [];
     private bool isLoading = true;
-
     private string SearchTerm = "";
     private bool ShowFilters = false;
+    private Modal uploadModal = default!;
+    private IBrowserFile? selectedFile;
+    private string title = "";
+    private string description = "";
+    private bool isProcessing = false;
+    private string? errorMessage;
+    private string? processingMessage;
+    private int currentStep = 1;
+    private List<SocialAccountDto> accounts = new();
+    private HashSet<Guid> selectedAccountIds = [];
+    private bool isLoadingAccounts = true;
+    private Guid? mediaId;
+    private bool allSelected => accounts.Count > 0 && selectedAccountIds.Count == accounts.Count;
+    private void ToggleAccount(Guid accountId, bool isChecked)
+    {
+        if (isChecked) selectedAccountIds.Add(accountId);
+        else selectedAccountIds.Remove(accountId);
+    }
+
+    private void ToggleAll(bool isChecked)
+    {
+        if (isChecked)
+        {
+            selectedAccountIds = accounts.Select(a => a.Id).ToHashSet();
+        }
+        else
+        {
+            selectedAccountIds.Clear();
+        }
+    }
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
+    private async Task OpenUploadModal()
+    {
+        ResetUploadState();
+
+        await uploadModal.ShowAsync();
+
+        _ = LoadSocialAccounts();
+    }
+
+    private async Task CloseUploadModal()
+    {
+        selectedFile = null;
+        title = "";
+        description = "";
+        errorMessage = null;
+        await uploadModal.HideAsync();
+    }
+
+
+    private async Task ContinueToAccounts()
+    {
+        if (selectedFile is null || string.IsNullOrWhiteSpace(title))
+            return;
+
+        isProcessing = true;
+        errorMessage = null;
+        processingMessage = "Uploading your video...";
+
+        try
+        {
+            await using var stream = selectedFile.OpenReadStream(
+                maxAllowedSize: 500 * 1024 * 1024);
+
+            var result = await MediaApiClient.UploadMediaAsync(
+                organizationId,
+                stream,
+                selectedFile.Name,
+                selectedFile.ContentType,
+                title,
+                string.IsNullOrWhiteSpace(description) ? null : description);
+
+            if (result.Success)
+            {
+                mediaId = result.Data;
+
+                currentStep = 2;
+            }
+            else
+            {
+                errorMessage = result.ErrorMessage ?? "Upload failed. Please try again.";
+            }
+        }
+        catch
+        {
+            errorMessage = "Something went wrong during upload.";
+        }
+        finally
+        {
+            isProcessing = false;
+            processingMessage = null;
+        }
+    }
+    private Task ContinueToPublish()
+    {
+        currentStep = 3;
+        return Task.CompletedTask;
+    }
+    private async Task Publish()
+    {
+        isProcessing = true;
+        processingMessage = "Publishing your video...";
+
+        try
+        {
+            // Send mediaId + selected accounts to API
+
+            @* await PublishMedia(); *@
+
+            currentStep = 4;
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+    private async Task PreviousStep()
+    {
+        if (currentStep > 1)
+        {
+            currentStep--;
+        }
+        await Task.CompletedTask;
+    }
+    private static string FormatFileSize(long bytes)
+    {
+        return bytes switch
+        {
+            < 1024 * 1024 => $"{bytes / 1024.0:0.0} KB",
+            _ => $"{bytes / (1024.0 * 1024):0.0} MB"
+        };
+    }
+
+
 
     private void Search(ChangeEventArgs e)
     {
@@ -281,28 +571,37 @@
 
         isLoading = false;
     }
-
-    @* private string GetStatusClass(VideoStatus status)
+    private async Task LoadSocialAccounts()
     {
-        return status switch
+        try
         {
-            VideoStatus.Uploaded => "status-connected",
-            VideoStatus.Uploading => "status-uploading",
-            VideoStatus.Error => "status-error",
-            VideoStatus.Waiting => "status-disconnected",
-            _ => "status-unknown"
-        };
+            isLoadingAccounts = true;
+
+            var result = await SocialAccountApiClient.GetConnectedAccountsAsync(organizationId);
+            if (result.Success)
+            {
+                accounts = result.Data;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Could not load your social accounts.";
+        }
+        finally
+        {
+            isLoadingAccounts = false;
+
+            await InvokeAsync(StateHasChanged);
+        }
     }
-
-    private string GetStatusText(VideoStatus status)
+    private void ResetUploadState()
     {
-        return status switch
-        {
-            VideoStatus.Uploaded => "Uploaded",
-            VideoStatus.Uploading => "Uploading",
-            VideoStatus.Error => "Upload error",
-            VideoStatus.Waiting => "Waiting to upload",
-            _ => "Unknown status"
-        };
-    } *@
+        selectedFile = null;
+        title = "";
+        description = "";
+        errorMessage = null;
+        processingMessage = null;
+        isProcessing = false;
+        currentStep = 1;
+    }
 }
