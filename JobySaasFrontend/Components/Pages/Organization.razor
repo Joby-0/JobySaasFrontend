@@ -4,6 +4,7 @@
 @using JobySaasFrontend.Models.DTO
 @using JobySaasFrontend.Services
 @inject IOrganizationApiClient OrganizationService
+@inject OrganizationStateService OrganizationState
 
 <div class="container">
     @if (isLoading)
@@ -53,13 +54,15 @@
 
         </div>
         <div class="organization-actions d-flex gap-2 mt-3">
-            <AuthorizeView Roles="Admin,Owner">
-                <LinkBox BackgroundColor="none" Class="border" Text="Plan" Href="@($"/org/{organizationId}/manage-plan")" Icon="IconName.BoxArrowUpRight" />
-            </AuthorizeView>
-            <LinkBox BackgroundColor="none" Class="border" Text="Invite Members" Href="@($"/org/{organizationId}/invite")" Icon="IconName.BoxArrowUpRight" />
-            <LinkBox BackgroundColor="none" Class="border" Text="Settings" Href="@($"/org/{organizationId}/settings")" Icon="IconName.BoxArrowUpRight" />
+            @if (OrganizationState.CurrentOrganization?.Role is "Admin" or "Owner")
+            {
+                <LinkBox BackgroundColor="none" Class="border" Text="Plan" Href="@($"/org/{OrganizationState.CurrentOrganization.Id}/manage-plan")" Icon="IconName.BoxArrowUpRight" />
+                <LinkBox BackgroundColor="none" Class="border" Text="Invite Members" Href="@($"/org/{organizationId}/invite")" Icon="IconName.BoxArrowUpRight" />
+            }
+            
             <LinkBox BackgroundColor="none" Class="border" Text="Videos" Href="@($"/org/{organizationId}/videos")" Icon="IconName.BoxArrowUpRight" />
             <LinkBox BackgroundColor="none" Class="border" Text="Social Accounts" Href="@($"/org/{organizationId}/social-accounts")" Icon="IconName.BoxArrowUpRight" />
+            <LinkBox BackgroundColor="none" Class="border" Text="Settings" Href="@($"/org/{organizationId}/settings")" Icon="IconName.BoxArrowUpRight" />
             <LinkBox BackgroundColor="none" Class="border" Text="Support" Href="@($"/org/{organizationId}/support")" Icon="IconName.BoxArrowUpRight" />
 
             
