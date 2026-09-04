@@ -7,6 +7,7 @@ public class OrganizationDto
     public Guid Id { get; set; }
     public string Name { get; set; }
     public Guid OwnerId { get; set; }
+    public string Role { get; set; } 
 }
 
 public class OrganizationMemberDTO

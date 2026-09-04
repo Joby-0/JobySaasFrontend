@@ -14,6 +14,8 @@ public class OrganizationStateService
 
     public OrganizationDto? CurrentOrganization { get; private set; }
 
+    public bool IsAdminOrOwner => CurrentOrganization?.Role is "Admin" or "Owner";
+
     public bool IsLoaded { get; private set; }
 
     public async Task LoadAsync()
