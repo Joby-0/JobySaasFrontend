@@ -34,7 +34,7 @@ public class OrganizationApiClient : IOrganizationApiClient
 
     public async Task<OrganizationDto?> GetOrganizationAsync(Guid organizationId)
     {
-        var response = await _http.GetAsync($"api/Organization/{organizationId}");
+        var response = await _http.GetAsync($"api/Organization/{organizationId}/get");
 
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;

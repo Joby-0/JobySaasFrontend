@@ -1,0 +1,40 @@
+.organization-details {
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.statistic-value {
+    font-size: 1.7rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-primary);
+}
+
+.statistic-label {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: rgba(61, 64, 91, 0.7);
+}
+
+@media (max-width: 576px) {
+    .organization-stats {
+        align-self: stretch;
+        justify-content: space-between;
+        gap: 1rem !important;
+    }
+
+    .statistic-item {
+        min-width: 0;
+    }
+
+    .statistic-value {
+        font-size: 1.4rem;
+    }
+
+    .statistic-label {
+        font-size: 0.7rem;
+    }
+}

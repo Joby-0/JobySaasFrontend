@@ -1,0 +1,138 @@
+@page "/org/{organizationId:guid}/organization"
+@using BlazorBootstrap
+@using JobySaasFrontend.Components.Components
+@using JobySaasFrontend.Models.DTO
+@using JobySaasFrontend.Services
+@inject IOrganizationApiClient OrganizationService
+
+<div class="container">
+    @if (isLoading)
+    {
+        <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (organization == null)
+    {
+        <div class="alert alert-danger" role="alert">
+            Organization not found.
+        </div>
+    }
+    else
+    {
+        <div class="organization-details p-4 bg-third rounded-3 position-relative">
+
+            <div class="organization-info">
+                <h1 class="fw-bold mb-2">@organization?.Name</h1>
+
+                <p class="mb-0 text-muted">
+                    Your organization's workspace and content overview.
+                </p>
+            </div>
+
+            <div class="organization-stats d-flex gap-4 end-0 position-absolute bottom-0 py-1 px-2 small text-muted">
+
+                <div class="statistic-item">
+                    <span class="statistic-value">12/15</span>
+                    <span class="statistic-label">Users</span>
+                </div>
+
+                <div class="statistic-item">
+                    <span class="statistic-value">32</span>
+                    <span class="statistic-label">Uploads</span>
+                </div>
+
+                <div class="statistic-item">
+                    <span class="statistic-value">5</span>
+                    <span class="statistic-label">Social accounts</span>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="organization-actions d-flex gap-2 mt-3">
+            <AuthorizeView Roles="Admin,Owner">
+                <LinkBox BackgroundColor="none" Class="border" Text="Plan" Href="@($"/org/{organizationId}/manage-plan")" Icon="IconName.BoxArrowUpRight" />
+            </AuthorizeView>
+            <LinkBox BackgroundColor="none" Class="border" Text="Invite Members" Href="@($"/org/{organizationId}/invite")" Icon="IconName.BoxArrowUpRight" />
+            <LinkBox BackgroundColor="none" Class="border" Text="Settings" Href="@($"/org/{organizationId}/settings")" Icon="IconName.BoxArrowUpRight" />
+            <LinkBox BackgroundColor="none" Class="border" Text="Videos" Href="@($"/org/{organizationId}/videos")" Icon="IconName.BoxArrowUpRight" />
+            <LinkBox BackgroundColor="none" Class="border" Text="Social Accounts" Href="@($"/org/{organizationId}/social-accounts")" Icon="IconName.BoxArrowUpRight" />
+            <LinkBox BackgroundColor="none" Class="border" Text="Support" Href="@($"/org/{organizationId}/support")" Icon="IconName.BoxArrowUpRight" />
+
+            
+
+
+        </div>
+
+        <div class="mt-4 members">
+            <h2 class="fw-bold mb-3">Members</h2>
+            <div class="d-flex gap-3 flex-wrap">
+                @if (members == null || isMembersLoading)
+                {
+                    <div class="d-flex justify-content-center align-items-center" style="height: 100px;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                }
+                else if (members.Count == 0)
+                {
+                    <div class="alert alert-info" role="alert">
+                        No members found.
+                    </div>
+                }
+                else
+                {
+                    @foreach (var member in members)
+                    {
+                        <div class="member-card p-3 bg-third rounded-3 d-flex align-items-center gap-2">
+                            <img src="@member.ProfileImage" alt="@member.FirstName @member.LastName" class="rounded-circle"
+                                 width="40" height="40" />
+                            <div>
+                                <span class="small text-muted">@member.Role</span>
+                                <div class="fw-bold">@member.FirstName Johan Bylander @member.LastName</div>
+                                <div class="text-muted small">@member.Email JohanJohan.bylander@gmail.com</div>
+                            </div>
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Guid organizationId { get; set; }
+
+    public OrganizationDto? organization { get; set; } = new OrganizationDto();
+    public List<OrganizationMemberDTO>? members { get; set; } = new List<OrganizationMemberDTO>();
+    bool isLoading { get; set; } = true;
+    bool isMembersLoading { get; set; } = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await OrganizationService.GetOrganizationAsync(organizationId);
+        organization = result;
+        isLoading = false;
+
+        _ = LoadMembersAsync();
+    }
+
+    private async Task LoadMembersAsync()
+    {
+        isMembersLoading = true;
+        // Implement logic to load members asynchronously
+        var result = await OrganizationService.GetMembersAsync(organizationId);
+        members = result.Data.ToList();
+
+        isMembersLoading = false;
+        await InvokeAsync(StateHasChanged);
+
+    }
+
+}
