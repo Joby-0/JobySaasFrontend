@@ -62,6 +62,7 @@ builder.Services.AddJwtTokenService(builder.Configuration);
 
 builder.Services.AddScoped<IEmailSender<ApplicationUser>, EmailSender>();
 builder.Services.AddScoped<OrganizationStateService>(); //iterface on this maybe
+builder.Services.AddScoped<AlertService>();
 
 
 

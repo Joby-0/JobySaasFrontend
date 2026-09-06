@@ -11,6 +11,8 @@
 @inject IYoutubeApiClient YoutubeApi
 @inject NavigationManager NavigationManager
 
+@inject AlertService AlertService
+
 <div class="container">
     <div class="options-bar d-flex justify-content-between">
         <div class="search-div d-flex">
@@ -306,6 +308,9 @@
 
         if (result.Success)
             accounts = result.Data;
+        else{
+            AlertService.Show(result.ErrorMessage, Models.AlertType.Error);
+        }
 
         isLoading = false;
     }
