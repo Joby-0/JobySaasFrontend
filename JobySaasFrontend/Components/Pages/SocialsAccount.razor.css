@@ -78,3 +78,7 @@
 .filter-btn:hover{
     background-color: var(--color-hover);
 }
+
+.status-disconnected{
+    background-color: var(--color-secondary);
+}

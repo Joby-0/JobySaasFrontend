@@ -16,6 +16,7 @@ builder.Services.AddHttpContextAccessor();
 
 // Add services to the container.
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+builder.Services.AddBlazorBootstrap();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityRedirectManager>();
@@ -62,11 +63,9 @@ builder.Services.AddJwtTokenService(builder.Configuration);
 
 builder.Services.AddScoped<IEmailSender<ApplicationUser>, EmailSender>();
 builder.Services.AddScoped<OrganizationStateService>(); //iterface on this maybe
-builder.Services.AddScoped<AlertService>();
 
 
 
-builder.Services.AddBlazorBootstrap();
 
 var app = builder.Build();
 

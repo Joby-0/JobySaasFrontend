@@ -11,9 +11,10 @@
 @inject IYoutubeApiClient YoutubeApi
 @inject NavigationManager NavigationManager
 
-@inject AlertService AlertService
+@inject ToastService ToastService
 
 <div class="container">
+    <JobySaasFrontend.Components.Components.Alert />
     <div class="options-bar d-flex justify-content-between">
         <div class="search-div d-flex">
 
@@ -239,7 +240,7 @@
                                             Edit
                                         </DropdownItem>
 
-                                        <DropdownItem>
+                                        <DropdownItem @onclick="(() => DisconnectAccount(account.Id))">
                                             <i class="bi bi-x-circle me-2"></i>
                                             Disconnect
                                         </DropdownItem>
@@ -308,13 +309,28 @@
 
         if (result.Success)
             accounts = result.Data;
-        else{
-            AlertService.Show(result.ErrorMessage, Models.AlertType.Error);
+        else
+        {
         }
 
         isLoading = false;
     }
 
+    private async Task DisconnectAccount(Guid accountId)
+    {
+        var result = await SocialAccountApi.DisconnectAccountAsync(OrganizationId, accountId);
+        if (result.Success)
+        {
+            var message = new ToastMessage(ToastType.Success, IconName.Check2Circle, "Disconected account", "The account disconected successfuly");
+            ToastService.Notify(message);
+        }else{
+            var message = new ToastMessage(ToastType.Danger, IconName.ExclamationCircle, "Disconected account", result.ErrorMessage);
+            ToastService.Notify(message);
+        }
+            
+
+        StateHasChanged();
+    }
     private async Task OpenAddModal() => await addModal.ShowAsync();
 
     private async Task ConnectYoutube()

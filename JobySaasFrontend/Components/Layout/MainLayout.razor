@@ -6,11 +6,12 @@
 @inject OrganizationStateService OrganizationState
 
 @using JobySaasFrontend.Components.Account.Shared
-<Alert />
-<div class="app-shell">
 
+<div class="app-shell">
+    <Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
     <!-- Sidebar -->
-    <aside class="app-sidebar position-fixed top-0 start-0 z-3 d-flex flex-column vh-100 bg-white border-end shadow-sm py-2 px-3">
+    <aside
+        class="app-sidebar position-fixed top-0 start-0 z-3 d-flex flex-column vh-100 bg-white border-end shadow-sm py-2 px-3">
 
         <NavMenu />
 
@@ -44,7 +45,7 @@
                 <!-- Right side -->
                 <div class="header-actions me-3">
                     <button class="btn">
-                        <Icon Name="IconName.Bell"/>
+                        <Icon Name="IconName.Bell" />
                     </button>
 
                     <AccountDropdown />
