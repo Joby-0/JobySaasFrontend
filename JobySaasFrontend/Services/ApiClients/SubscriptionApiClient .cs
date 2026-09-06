@@ -16,7 +16,7 @@ public class SubscriptionApiClient : ISubscriptionApiClient
     {
         var request = new SelectSubscriptionRequest(subscriptionId);
 
-        var response = await _http.PostAsJsonAsync($"api/Subscription/subscription/{organizationId}", request);
+        var response = await _http.PostAsJsonAsync($"api/Subscription/{organizationId}/subscription", request);
 
         response.EnsureSuccessStatusCode();
 

@@ -524,7 +524,7 @@
         try
         {
             // Send mediaId + selected accounts to API
-
+            await MediaApiClient.PublishMediaAsync(organizationId, mediaId.Value, selectedAccountIds.ToList());
             @* await PublishMedia(); *@
 
             currentStep = 4;

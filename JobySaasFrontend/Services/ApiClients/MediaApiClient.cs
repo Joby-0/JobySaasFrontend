@@ -46,4 +46,12 @@ public class MediaApiClient : IMediaApiClient
         var result = await response.Content.ReadFromJsonAsync<ServiceResult<Guid>>();
         return result ?? new ServiceResult<Guid> { Success = false, ErrorMessage = "Empty response from API." };
     }
+
+    public async Task<ServiceResult<Guid>> PublishMediaAsync(Guid organizationId, Guid mediaId, List<Guid> socialAccountIds)
+    {
+        var response = await _http.PostAsJsonAsync($"api/Media/{organizationId}/media/{mediaId}/publish", socialAccountIds);
+
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<ServiceResult<Guid>>();
+    }
 }
