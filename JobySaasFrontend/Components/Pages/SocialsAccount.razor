@@ -225,7 +225,7 @@
 
                                     <DropdownMenu Alignment="DropdownMenuAlignment.End">
 
-                                        <DropdownItem>
+                                        <DropdownItem @onclick="(() => ViewDetails(account.Id))">
                                             <i class="bi bi-eye me-2"></i>
                                             View account
                                         </DropdownItem>
@@ -302,6 +302,10 @@
     {
         // Clear filters later
     }
+    private void ViewDetails(Guid accountId)
+    {
+        NavigationManager.NavigateTo($"/{OrganizationId}/accountdetails/{accountId}", forceLoad: true);
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -323,12 +327,15 @@
         {
             var message = new ToastMessage(ToastType.Success, IconName.Check2Circle, "Disconected account", "The account disconected successfuly");
             ToastService.Notify(message);
-        }else{
-            var message = new ToastMessage(ToastType.Danger, IconName.ExclamationCircle, "Disconected account", result.ErrorMessage);
+        }
+        else
+        {
+            var message = new ToastMessage(ToastType.Danger, IconName.ExclamationCircle, "Disconected account",
+result.ErrorMessage);
             ToastService.Notify(message);
         }
-            
 
+            
         StateHasChanged();
     }
     private async Task OpenAddModal() => await addModal.ShowAsync();

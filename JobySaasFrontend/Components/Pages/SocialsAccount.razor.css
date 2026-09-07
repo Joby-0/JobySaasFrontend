@@ -80,5 +80,5 @@
 }
 
 .status-disconnected{
-    background-color: var(--color-secondary);
+    background-color: red;
 }

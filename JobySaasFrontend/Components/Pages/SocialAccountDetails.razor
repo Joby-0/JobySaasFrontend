@@ -1,0 +1,75 @@
+@page "/{organizationId:guid}/accountdetails/{accountId:guid}"
+@using BlazorBootstrap
+@using JobySaasFrontend.Services
+@using JobySaasFrontend.Models.DTO
+@inject ISocialAccountApiClient SocialAccountApi
+
+<div class="container">
+    @if (isLoading)
+    {
+
+    }
+    else
+    {
+        <div class="banner" style="background-image: url('@details.AccountBanner');"></div>
+
+        <div class="count-div d-flex gap-4">
+
+                
+            <div class="d-flex align-items-center gap-2">
+                <Icon Name="IconName.Person" />
+                <strong>@details.Followers</strong>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <Icon Name="IconName.Eye" />
+                <strong>@details.Views</strong>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <Icon Name="IconName.Film" />
+                <strong>@details.VideoCount</strong>
+            </div>
+
+        </div>
+        <div class="analytics">
+            <div>
+
+            </div>
+            <div>
+
+            </div>
+        </div>
+
+        <div class="recent-videos">
+
+        </div>
+        
+        
+        <div class="account-info"></div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Guid organizationId { get; set; }
+
+    [Parameter]
+    public Guid accountId { get; set; }
+
+    bool isLoading = true;
+    private SocialAccountDetailsDto? details;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await SocialAccountApi.GetAccountDetailsAsync(organizationId, accountId);
+
+        if (result.Success)
+            details = result.Data;
+        else
+        {
+        }
+
+        isLoading = false;
+    }
+}

@@ -17,6 +17,13 @@ public class SocialAccountApiClient : ISocialAccountApiClient
         return await response.Content.ReadFromJsonAsync<ServiceResult<bool>>() ?? new ServiceResult<bool> { Success = false, ErrorMessage = "Empty response." };
     }
 
+    public async Task<ServiceResult<SocialAccountDetailsDto>> GetAccountDetailsAsync(Guid organizationId, Guid accountId)
+    {
+        var response = await _http.GetAsync($"api/SocialAccount/{organizationId}/details?accountId={accountId}");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<ServiceResult<SocialAccountDetailsDto>>() ?? new ServiceResult<SocialAccountDetailsDto> { Success = false, ErrorMessage = "Empty response." };
+    }
+
     public async Task<ServiceResult<List<SocialAccountDto>>> GetConnectedAccountsAsync(Guid organizationId)
     {
         var response = await _http.GetAsync($"api/SocialAccount/{organizationId}/mine");
