@@ -11,24 +11,28 @@ public class SocialAccountApiClient : ISocialAccountApiClient
 
     public async Task<ServiceResult<bool>> DisconnectAccountAsync(Guid organizationId, Guid accountId)
     {
-        var response = await _http.GetAsync($"api/SocialAccount/{organizationId}/disconnect?accountId={accountId}");
-        response.EnsureSuccessStatusCode();
+        var response = await _http.DeleteAsync($"api/SocialAccount/{organizationId}/disconnect?accountId={accountId}");
 
-        return await response.Content.ReadFromJsonAsync<ServiceResult<bool>>() ?? new ServiceResult<bool> { Success = false, ErrorMessage = "Empty response." };
+        var result = await response.Content.ReadFromJsonAsync<ServiceResult<bool>>();
+
+        return result ?? ServiceResult<bool>.Fail("Empty response.");
     }
 
-    public async Task<ServiceResult<SocialAccountDetailsDto>> GetAccountDetailsAsync(Guid organizationId, Guid accountId)
+    public async Task<ServiceResult<SocialAccountDetailsDto>> GetAccountDetailsAsync( Guid organizationId,Guid accountId)
     {
         var response = await _http.GetAsync($"api/SocialAccount/{organizationId}/details?accountId={accountId}");
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<ServiceResult<SocialAccountDetailsDto>>() ?? new ServiceResult<SocialAccountDetailsDto> { Success = false, ErrorMessage = "Empty response." };
+
+        var result = await response.Content.ReadFromJsonAsync<ServiceResult<SocialAccountDetailsDto>>();
+
+        return result ?? ServiceResult<SocialAccountDetailsDto>.Fail("Empty response.");
     }
 
     public async Task<ServiceResult<List<SocialAccountDto>>> GetConnectedAccountsAsync(Guid organizationId)
     {
         var response = await _http.GetAsync($"api/SocialAccount/{organizationId}/mine");
-        response.EnsureSuccessStatusCode();
+
         var result = await response.Content.ReadFromJsonAsync<ServiceResult<List<SocialAccountDto>>>();
-        return result ?? new ServiceResult<List<SocialAccountDto>> { Success = false, ErrorMessage = "Empty response." };
+
+        return result ?? ServiceResult<List<SocialAccountDto>>.Fail("Empty response.");
     }
 }
