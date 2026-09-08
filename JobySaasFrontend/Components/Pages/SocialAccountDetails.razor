@@ -12,6 +12,9 @@
     else
     {
         <div class="banner" style="background-image: url('@details.AccountBanner');"></div>
+        <div>
+            
+        </div>
 
         <div class="count-div d-flex gap-4">
 
@@ -32,21 +35,107 @@
             </div>
 
         </div>
-        <div class="analytics">
-            <div>
+        <div class="analytics my-5">
 
-            </div>
-            <div>
+            @if (isAnalyticsLoading)
+            {
+                <div class="row g-3" style="height:360px;">
+                    <!-- Big tile 4x4 -->
+                    <div class="col-8 h-100">
+                        <PlaceholderContainer Animation="PlaceholderAnimation.Glow">
+                            <Placeholder Style="width:100%; height:100%;" />
+                        </PlaceholderContainer>
+                    </div>
 
-            </div>
+                    <!-- Right column: medium + 2 small -->
+                    <div class="col-4 h-100">
+                        <div class="d-flex flex-column gap-3 h-100">
+                            <!-- Medium tile 1x2 -->
+                            <div class="flex-grow-1">
+                                <PlaceholderContainer Animation="PlaceholderAnimation.Glow">
+                                    <Placeholder Style="width:100%; height:100%;" />
+                                </PlaceholderContainer>
+                            </div>
+
+                            <!-- Small tiles 1x1 -->
+                            <div class="d-flex gap-3 flex-grow-1">
+                                <div class="flex-grow-1">
+                                    <PlaceholderContainer Animation="PlaceholderAnimation.Glow">
+                                        <Placeholder Animation="PlaceholderAnimation.Glow" Style="width:100%; height:100%;" />
+                                    </PlaceholderContainer>
+
+                                </div>
+                                <div class="flex-grow-1">
+                                    <PlaceholderContainer Animation="PlaceholderAnimation.Glow">
+                                        <Placeholder Animation="PlaceholderAnimation.Glow" Style="width:100%; height:100%;" />
+                                    </PlaceholderContainer>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="row g-3" style="height:360px;">
+                    <!-- Big tile 4x4 -->
+                    <div class="col-8 h-100">
+                       
+                    </div>
+
+                    <!-- Right column: medium + 2 small -->
+                    <div class="col-4 h-100">
+                        <div class="d-flex flex-column gap-3 h-100">
+                            <!-- Medium tile 1x2 -->
+                            <div class="flex-grow-1">
+                                
+                            </div>
+
+                            <!-- Small tiles 1x1 -->
+                            <div class="d-flex gap-3 flex-grow-1">
+                                <div class="flex-grow-1">
+                                    
+                                </div>
+                                <div class="flex-grow-1">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
 
-        <div class="recent-videos">
+        @if (isRecentVideosLoading)
+        {
+            <div class="recent-videos">
+                @for (int i = 0; i < 4; i++)
+                {
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <!-- thumbnail -->
+                        <Placeholder Animation="PlaceholderAnimation.Glow" Style="width:140px; height:80px;" />
+
+                        <div class="d-flex flex-column gap-2 flex-grow-1">
+                            <!-- title line -->
+                            <Placeholder Animation="PlaceholderAnimation.Glow" Size="PlaceholderSize.Large" Width="PlaceholderWidth.Col7" />
+
+                            <!-- subtitle line -->
+                            <Placeholder Animation="PlaceholderAnimation.Glow" Size="PlaceholderSize.Small"
+                                         Width="PlaceholderWidth.Col4" />
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="recent-videos">
+
+            </div>
+        }
+        <div class="account-info">
 
         </div>
-        
-        
-        <div class="account-info"></div>
     }
 </div>
 
@@ -58,6 +147,8 @@
     public Guid accountId { get; set; }
 
     bool isLoading = true;
+    bool isAnalyticsLoading = true;
+    bool isRecentVideosLoading = true;
     private SocialAccountDetailsDto? details;
 
     protected override async Task OnInitializedAsync()
