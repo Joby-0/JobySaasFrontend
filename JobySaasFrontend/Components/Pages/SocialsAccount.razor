@@ -330,8 +330,7 @@
         }
         else
         {
-            var message = new ToastMessage(ToastType.Danger, IconName.ExclamationCircle, "Disconected account",
-result.ErrorMessage);
+            var message = new ToastMessage(ToastType.Danger, IconName.ExclamationCircle, "Disconected account", result.Error);
             ToastService.Notify(message);
         }
 

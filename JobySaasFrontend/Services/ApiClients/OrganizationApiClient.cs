@@ -21,7 +21,7 @@ public class OrganizationApiClient : IOrganizationApiClient
     public async Task<ServiceResult<List<OrganizationMemberDTO>>> GetMembersAsync(Guid organizationId)
     {
         var response = await _http.GetAsync($"api/Organization/{organizationId}/members");
-        response.EnsureSuccessStatusCode();
+        
         return await response.Content.ReadFromJsonAsync<ServiceResult<List<OrganizationMemberDTO>>>();
     }
 
