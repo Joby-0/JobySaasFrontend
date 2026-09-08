@@ -10,43 +10,48 @@ public class OrganizationApiClient : IOrganizationApiClient
 
     public OrganizationApiClient(HttpClient http) => _http = http;
 
-    public async Task<OrganizationDto> CreateOrganizationAsync(CreateOrganizationRequest request)
+    public async Task<ServiceResult<OrganizationDto>> CreateOrganizationAsync(CreateOrganizationRequest request)
     {
         var response = await _http.PostAsJsonAsync("api/Organization/create", request);
-        response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadFromJsonAsync<OrganizationDto>() ?? throw new InvalidOperationException("API returned an empty response for CreateOrganization.");
+        var result = await response.Content.ReadFromJsonAsync<ServiceResult<OrganizationDto>>();
+
+        return result ?? ServiceResult<OrganizationDto>.Fail("Empty response from API.");
     }
 
     public async Task<ServiceResult<List<OrganizationMemberDTO>>> GetMembersAsync(Guid organizationId)
     {
         var response = await _http.GetAsync($"api/Organization/{organizationId}/members");
-        
-        return await response.Content.ReadFromJsonAsync<ServiceResult<List<OrganizationMemberDTO>>>();
+
+        var result = await response.Content.ReadFromJsonAsync<ServiceResult<List<OrganizationMemberDTO>>>();
+
+        return result ?? ServiceResult<List<OrganizationMemberDTO>>.Fail("Empty response from API.");
     }
 
-    public async Task<List<OrganizationDto>> GetMyOrganizationsAsync()
+    public async Task<ServiceResult<List<OrganizationDto>>> GetMyOrganizationsAsync()
     {
         var response = await _http.GetAsync("api/Organization/mine");
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<List<OrganizationDto>>() ?? [];
+
+        var result = await response.Content.ReadFromJsonAsync<ServiceResult<List<OrganizationDto>>>();
+
+        return result ?? ServiceResult<List<OrganizationDto>>.Fail("Empty response from API.");
     }
 
-    public async Task<OrganizationDto?> GetOrganizationAsync(Guid organizationId)
+    public async Task<ServiceResult<OrganizationDto>> GetOrganizationAsync(Guid organizationId)
     {
         var response = await _http.GetAsync($"api/Organization/{organizationId}/get");
 
-        if (response.StatusCode == HttpStatusCode.NotFound)
-            return null;
+        var result = await response.Content.ReadFromJsonAsync<ServiceResult<OrganizationDto>>();
 
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<OrganizationDto>();
+        return result ?? ServiceResult<OrganizationDto>.Fail("Empty response from API."); ;
     }
 
     public async Task<ServiceResult<string>> RemoveMemberAsync(Guid organizationId, Guid userId)
     {
         var response = await _http.DeleteAsync($"api/Organization/{organizationId}/members/{userId}/remove");
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<ServiceResult<string>>();
+
+        var result = await response.Content.ReadFromJsonAsync<ServiceResult<string>>();
+
+        return result ?? ServiceResult<string>.Fail("Empty response from API.");
     }
 }

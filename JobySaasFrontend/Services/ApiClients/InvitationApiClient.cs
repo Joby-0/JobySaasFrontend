@@ -16,11 +16,6 @@ public class InvitationApiClient : IInvitationApiClient
     {
         var response = await _http.GetAsync($"api/Invitation/accept?code={Uri.EscapeDataString(code)}");
 
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
-        {
-            return ServiceResult<bool>.Fail("You are not authenticated.");
-        }
-
         var result = await response.Content.ReadFromJsonAsync<ServiceResult<bool>>();
 
         return result ?? ServiceResult<bool>.Fail("Empty response from API.");
@@ -29,11 +24,6 @@ public class InvitationApiClient : IInvitationApiClient
     public async Task<ServiceResult<string>> CreateInviteCodeAsync(Guid organizationId, int expireInMinutes)
     {
         var response = await _http.PostAsync($"api/Invitation/createinvitecode/{organizationId}?expireInMinutes={expireInMinutes}", null);
-
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
-        {
-            return ServiceResult<string>.Fail("You are not authenticated.");
-        }
 
         var result = await response.Content.ReadFromJsonAsync<ServiceResult<string>>();
 
