@@ -30,14 +30,14 @@ public class InvitationApiClient : IInvitationApiClient
     {
         var response = await _http.PostAsync($"api/Invitation/createinvitecode/{organizationId}?expireInMinutes={expireInMinutes}", null);
 
-        var result = await response.Content.ReadFromJsonAsync<ServiceResult<string>>();
-
-        if (result is null)
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
-            return ServiceResult<string>.Fail("Empty response from API.");
+            return ServiceResult<string>.Fail("You are not authenticated.");
         }
 
-        return result;
+        var result = await response.Content.ReadFromJsonAsync<ServiceResult<string>>();
+
+        return result ?? ServiceResult<string>.Fail("Empty response from API.");
     }
 
     public async Task<ServiceResult<InvitationPreviewDto>> GetInvitePreviewAsync(string code)
@@ -48,6 +48,6 @@ public class InvitationApiClient : IInvitationApiClient
 
         var result = await response.Content.ReadFromJsonAsync<ServiceResult<InvitationPreviewDto>>();
 
-        return result ??  ServiceResult<InvitationPreviewDto>.Fail("Empty response from API.");
+        return result ?? ServiceResult<InvitationPreviewDto>.Fail("Empty response from API.");
     }
 }
