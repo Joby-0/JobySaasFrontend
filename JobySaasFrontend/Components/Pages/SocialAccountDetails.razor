@@ -75,7 +75,8 @@
         //overview tab
         @if (activeTab == AccountTab.Overview)
         {
-            <AccountOverview isAnalyticsLoading="isAnalyticsLoading" IsRecentVideosLoading="IsRecentVideosLoading"/>
+            <AccountOverview analytics="analytics" isAnalyticsLoading="isAnalyticsLoading"
+                             IsRecentVideosLoading="IsRecentVideosLoading" />
         }
         @if (activeTab == AccountTab.Videos)
         {
@@ -118,10 +119,10 @@
     public Guid accountId { get; set; }
 
     private SocialAccountDetailsDto? details;
-    @* private AnalyticsDto? analytics;
-    private List<VideoDto>? videos;
+    private List<DailyMetricDto>? analytics;
+    @* private List<VideoDto>? videos;
     private List<ShortDto>? shorts;
-    private AccountInfoDto? accountInfo; *@
+    private AccountInfoDto? accountInfo;  *@
 
     private bool isLoading = true;
     private bool isAnalyticsLoading = true;
@@ -143,14 +144,31 @@
     protected override async Task OnInitializedAsync()
     {
         var result = await SocialAccountApi.GetAccountDetailsAsync(organizationId, accountId);
+        var analyticsTask = LoadAnalytics();
 
         if (result.Success)
             details = result.Data;
         else
         {
         }
-
+        await Task.WhenAll(analyticsTask);
         isLoading = false;
-        isAnalyticsLoading = true;
+
+    }
+
+    private async Task LoadAnalytics()
+    {
+        var endDate = DateOnly.FromDateTime(DateTime.UtcNow);
+        var startDate = endDate.AddDays(-30);
+
+        var result = await SocialAccountApi.GetAccountPerformanceAsync(organizationId, accountId, startDate, endDate,
+CancellationToken.None);
+
+        if (result.Success)
+            analytics = result.Data;
+        else
+        {
+        }
+        isAnalyticsLoading = false;
     }
 }

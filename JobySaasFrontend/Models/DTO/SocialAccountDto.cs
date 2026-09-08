@@ -28,6 +28,16 @@ public class SocialAccountDetailsDto
     public SocialPlatform Platform {get; set;}
 
 }
+public class DailyMetricDto
+{
+    public DateOnly Date { get; set; }
+    public long Views { get; set; }
+    public long WatchTimeMinutes { get; set; }
+    public long Likes { get; set; }
+    public long Comments { get; set; }
+    public long Shares { get; set; }
+    public long SubscribersGained { get; set; }
+}
 
 public enum SocialAccountStatus
 {
