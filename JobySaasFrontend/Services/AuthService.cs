@@ -36,7 +36,8 @@ public class AuthService : IAuthService
         var user = new ApplicationUser
         {
             FirstName = request.FirstName,
-            LastName = request.LastName
+            LastName = request.LastName,
+            Email = request.Email,
         };
 
         await userStore.SetUserNameAsync(user, request.Email, CancellationToken.None);

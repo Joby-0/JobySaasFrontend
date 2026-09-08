@@ -1,0 +1,103 @@
+@using BlazorBootstrap
+<div class="analytics my-5">
+
+                
+    @if (isAnalyticsLoading)
+    {
+        <div class="row g-3" style="height:360px;">
+            <div class="col-8 h-100">
+                <PlaceholderContainer Animation="PlaceholderAnimation.Glow">
+                    <Placeholder Style="width:100%; height:100%;" />
+                </PlaceholderContainer>
+            </div>
+
+            <div class="col-4 h-100">
+                <div class="d-flex flex-column gap-3 h-100">
+
+                    <div class="flex-grow-1">
+                        <PlaceholderContainer Animation="PlaceholderAnimation.Glow">
+                            <Placeholder Style="width:100%; height:100%;" />
+                        </PlaceholderContainer>
+                    </div>
+
+                    <div class="d-flex gap-3 flex-grow-1">
+                        <div class="flex-grow-1">
+                            <PlaceholderContainer Animation="PlaceholderAnimation.Glow">
+                                <Placeholder Style="width:100%; height:100%;" />
+                            </PlaceholderContainer>
+                        </div>
+
+                        <div class="flex-grow-1">
+                            <PlaceholderContainer Animation="PlaceholderAnimation.Glow">
+                                <Placeholder Style="width:100%; height:100%;" />
+                            </PlaceholderContainer>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3" style="height:360px;">
+            <div class="col-8 h-100">
+                @* Analytics chart *@
+            </div>
+
+            <div class="col-4 h-100">
+                <div class="d-flex flex-column gap-3 h-100">
+
+                    <div class="flex-grow-1">
+                        @* Analytics card *@
+                    </div>
+
+                    <div class="d-flex gap-3 flex-grow-1">
+                        <div class="flex-grow-1">
+                            @* Analytics card *@
+                        </div>
+
+                        <div class="flex-grow-1">
+                            @* Analytics card *@
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@if (IsRecentVideosLoading)
+{
+    <div class="recent-videos">
+        @for (int i = 0; i < 4; i++)
+        {
+            <div class="d-flex align-items-center gap-3 mb-3">
+
+                <Placeholder Animation="PlaceholderAnimation.Glow" Style="width:140px; height:80px;" />
+
+                <div class="d-flex flex-column gap-2 flex-grow-1">
+
+                    <Placeholder Animation="PlaceholderAnimation.Glow" Size="PlaceholderSize.Large" Width="PlaceholderWidth.Col7" />
+
+                    <Placeholder Animation="PlaceholderAnimation.Glow" Size="PlaceholderSize.Small" Width="PlaceholderWidth.Col4" />
+
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="recent-videos">
+        @* Recent videos *@
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool isAnalyticsLoading { get; set; }
+
+    [Parameter]
+    public bool IsRecentVideosLoading { get; set; }
+}

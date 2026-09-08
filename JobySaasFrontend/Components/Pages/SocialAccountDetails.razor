@@ -1,5 +1,6 @@
 @page "/{organizationId:guid}/accountdetails/{accountId:guid}"
 @using BlazorBootstrap
+@using JobySaasFrontend.Components.Components
 @using JobySaasFrontend.Services
 @using JobySaasFrontend.Models.DTO
 @inject ISocialAccountApiClient SocialAccountApi
@@ -12,130 +13,100 @@
     else
     {
         <div class="banner" style="background-image: url('@details.AccountBanner');"></div>
-        <div>
-            
-        </div>
-
-        <div class="count-div d-flex gap-4">
-
-                
-            <div class="d-flex align-items-center gap-2">
-                <Icon Name="IconName.Person" />
-                <strong>@details.Followers</strong>
-            </div>
-
-            <div class="d-flex align-items-center gap-2">
-                <Icon Name="IconName.Eye" />
-                <strong>@details.Views</strong>
-            </div>
-
-            <div class="d-flex align-items-center gap-2">
-                <Icon Name="IconName.Film" />
-                <strong>@details.VideoCount</strong>
-            </div>
-
-        </div>
-        <div class="analytics my-5">
-
-            @if (isAnalyticsLoading)
-            {
-                <div class="row g-3" style="height:360px;">
-                    <!-- Big tile 4x4 -->
-                    <div class="col-8 h-100">
-                        <PlaceholderContainer Animation="PlaceholderAnimation.Glow">
-                            <Placeholder Style="width:100%; height:100%;" />
-                        </PlaceholderContainer>
+        <div class="d-flex pt-3">
+            <div class="img"><img src="@details.ProfileImageUrl" alt=""></div>
+            <div class="ps-4">
+                <h3 class="fw-bold">@details.AccountName</h3>
+                <span class="small muted">@details.Handle</span>
+                <div class="count-div d-flex gap-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <Icon Name="IconName.Person" />
+                        <strong>@details.Followers</strong>
                     </div>
 
-                    <!-- Right column: medium + 2 small -->
-                    <div class="col-4 h-100">
-                        <div class="d-flex flex-column gap-3 h-100">
-                            <!-- Medium tile 1x2 -->
-                            <div class="flex-grow-1">
-                                <PlaceholderContainer Animation="PlaceholderAnimation.Glow">
-                                    <Placeholder Style="width:100%; height:100%;" />
-                                </PlaceholderContainer>
-                            </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <Icon Name="IconName.Eye" />
+                        <strong>@details.Views</strong>
+                    </div>
 
-                            <!-- Small tiles 1x1 -->
-                            <div class="d-flex gap-3 flex-grow-1">
-                                <div class="flex-grow-1">
-                                    <PlaceholderContainer Animation="PlaceholderAnimation.Glow">
-                                        <Placeholder Animation="PlaceholderAnimation.Glow" Style="width:100%; height:100%;" />
-                                    </PlaceholderContainer>
-
-                                </div>
-                                <div class="flex-grow-1">
-                                    <PlaceholderContainer Animation="PlaceholderAnimation.Glow">
-                                        <Placeholder Animation="PlaceholderAnimation.Glow" Style="width:100%; height:100%;" />
-                                    </PlaceholderContainer>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <Icon Name="IconName.Film" />
+                        <strong>@details.VideoCount</strong>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <Icon Name="IconName.ChatLeftText" />
+                        <strong>@details.CommentCount</strong>
                     </div>
                 </div>
-            }
-            else
-            {
-                <div class="row g-3" style="height:360px;">
-                    <!-- Big tile 4x4 -->
-                    <div class="col-8 h-100">
-                       
-                    </div>
+            </div>
+        </div>
+        <div class="account-tabs mt-5">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <button class="nav-link @(activeTab == AccountTab.Overview ? "active" : "")"
+                            @onclick="() => activeTab = AccountTab.Overview">
+                        Overview
+                    </button>
+                </li>
 
-                    <!-- Right column: medium + 2 small -->
-                    <div class="col-4 h-100">
-                        <div class="d-flex flex-column gap-3 h-100">
-                            <!-- Medium tile 1x2 -->
-                            <div class="flex-grow-1">
-                                
-                            </div>
+                <li class="nav-item">
+                    <button class="nav-link @(activeTab == AccountTab.Videos ? "active" : "")"
+                            @onclick="() => activeTab = AccountTab.Videos">
+                        Videos
+                    </button>
+                </li>
 
-                            <!-- Small tiles 1x1 -->
-                            <div class="d-flex gap-3 flex-grow-1">
-                                <div class="flex-grow-1">
-                                    
-                                </div>
-                                <div class="flex-grow-1">
-                                    
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <li class="nav-item">
+                    <button class="nav-link @(activeTab == AccountTab.Shorts ? "active" : "")"
+                            @onclick="() => activeTab = AccountTab.Shorts">
+                        Shorts
+                    </button>
+                </li>
+
+                <li class="nav-item">
+                    <button class="nav-link @(activeTab == AccountTab.AccountInfo ? "active" : "")"
+                            @onclick="() => activeTab = AccountTab.AccountInfo">
+                        Account info
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        //overview tab
+        @if (activeTab == AccountTab.Overview)
+        {
+            <AccountOverview isAnalyticsLoading="isAnalyticsLoading" IsRecentVideosLoading="IsRecentVideosLoading"/>
+        }
+        @if (activeTab == AccountTab.Videos)
+        {
+            <div class="py-4">
+                <h4>Videos</h4>
+
+                @* Your videos component/content *@
+            </div>
+        }
+
+        @if (activeTab == AccountTab.Shorts)
+        {
+            <div class="py-4">
+                <h4>Shorts</h4>
+                @* Your shorts component/content *@
+            </div>
+        }
+
+        @if (activeTab == AccountTab.AccountInfo)
+        {
+            <div class="py-4">
+                <h4>Account information</h4>
+
+                <div class="account-info">
+                    @* Account information *@
                 </div>
-            }
-        </div>
-
-        @if (isRecentVideosLoading)
-        {
-            <div class="recent-videos">
-                @for (int i = 0; i < 4; i++)
-                {
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <!-- thumbnail -->
-                        <Placeholder Animation="PlaceholderAnimation.Glow" Style="width:140px; height:80px;" />
-
-                        <div class="d-flex flex-column gap-2 flex-grow-1">
-                            <!-- title line -->
-                            <Placeholder Animation="PlaceholderAnimation.Glow" Size="PlaceholderSize.Large" Width="PlaceholderWidth.Col7" />
-
-                            <!-- subtitle line -->
-                            <Placeholder Animation="PlaceholderAnimation.Glow" Size="PlaceholderSize.Small"
-                                         Width="PlaceholderWidth.Col4" />
-                        </div>
-                    </div>
-                }
             </div>
         }
-        else
-        {
-            <div class="recent-videos">
-
-            </div>
-        }
-        <div class="account-info">
-
-        </div>
+        //vidoes
+        //short
+        //idk
     }
 </div>
 
@@ -146,10 +117,28 @@
     [Parameter]
     public Guid accountId { get; set; }
 
-    bool isLoading = true;
-    bool isAnalyticsLoading = true;
-    bool isRecentVideosLoading = true;
     private SocialAccountDetailsDto? details;
+    @* private AnalyticsDto? analytics;
+    private List<VideoDto>? videos;
+    private List<ShortDto>? shorts;
+    private AccountInfoDto? accountInfo; *@
+
+    private bool isLoading = true;
+    private bool isAnalyticsLoading = true;
+    private bool IsRecentVideosLoading = true;
+    private bool isVideosLoading = true;
+    private bool isShortsLoading = true;
+    private bool isAccountInfoLoading = true;
+
+    private AccountTab activeTab = AccountTab.Overview;
+
+    private enum AccountTab
+    {
+        Overview,
+        Videos,
+        Shorts,
+        AccountInfo
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -162,5 +151,6 @@
         }
 
         isLoading = false;
+        isAnalyticsLoading = true;
     }
 }
