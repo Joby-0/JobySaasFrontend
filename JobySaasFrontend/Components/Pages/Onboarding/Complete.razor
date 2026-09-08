@@ -109,7 +109,7 @@
         // assumes OrganizationDto or a subscription-status endpoint tells you if it's active
         // exact check depends on what SubscriptionService actually exposes — tbd below
 
-        organizationName = org?.Name;
+        organizationName = org?.Data.Name;
 
         if (/* subscription is active */ false) // placeholder — depends on your data shape
         {

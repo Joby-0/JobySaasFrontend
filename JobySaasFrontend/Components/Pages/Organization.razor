@@ -120,7 +120,7 @@
     protected override async Task OnInitializedAsync()
     {
         var result = await OrganizationService.GetOrganizationAsync(organizationId);
-        organization = result;
+        organization = result.Data;
         isLoading = false;
 
         _ = LoadMembersAsync();

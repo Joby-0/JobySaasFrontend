@@ -23,7 +23,9 @@ public class OrganizationStateService
         if (IsLoaded)
             return;
 
-        Organizations = await _organizationApi.GetMyOrganizationsAsync();
+        var result = await _organizationApi.GetMyOrganizationsAsync();
+
+        Organizations = result.Data;
 
         if (Organizations.Count > 0)
         {

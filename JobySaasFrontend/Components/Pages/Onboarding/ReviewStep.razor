@@ -103,7 +103,7 @@
         try
         {
             var org = await OrganizationApi.CreateOrganizationAsync(new CreateOrganizationRequest(State.OrgName));
-            var checkout = await SubscriptionApi.CreateSubscriptionCheckoutAsync(org.Id, State.SelectedPlan!.Id);
+            var checkout = await SubscriptionApi.CreateSubscriptionCheckoutAsync(org.Data.Id, State.SelectedPlan!.Id);
 
             // real page leave — Stripe's hosted checkout, forceLoad required since it's an external URL
             NavigationManager.NavigateTo(checkout.Data, forceLoad: true);
