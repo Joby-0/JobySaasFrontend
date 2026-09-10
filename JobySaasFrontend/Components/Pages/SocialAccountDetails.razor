@@ -17,9 +17,9 @@
         <div class="d-flex pt-3">
             <div class="img"><img src="@details.ProfileImageUrl" alt=""></div>
             <div class="ps-4">
-                <h3 class="fw-bold">@details.AccountName</h3>
+                <h3 class="fw-bold mb-0">@details.AccountName</h3>
                 <span class="small muted">@details.Handle</span>
-                <div class="count-div d-flex gap-4">
+                <div class="count-div d-flex gap-4 mt-2">
                     <div class="d-flex align-items-center gap-2">
                         <Icon Name="IconName.Person" />
                         <strong>@details.Followers</strong>
@@ -44,28 +44,28 @@
         <div class="account-tabs mt-5">
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <button class="nav-link @(activeTab == AccountTab.Overview ? "active" : "")"
+                    <button class="nav-link color-primary @(activeTab == AccountTab.Overview ? "active" : "")"
                             @onclick="() => activeTab = AccountTab.Overview">
                         Overview
                     </button>
                 </li>
 
                 <li class="nav-item">
-                    <button class="nav-link @(activeTab == AccountTab.Videos ? "active" : "")"
+                    <button class="nav-link color-primary @(activeTab == AccountTab.Videos ? "active" : "")"
                             @onclick="() => activeTab = AccountTab.Videos">
                         Videos
                     </button>
                 </li>
 
                 <li class="nav-item">
-                    <button class="nav-link @(activeTab == AccountTab.Shorts ? "active" : "")"
+                    <button class="nav-link color-primary @(activeTab == AccountTab.Shorts ? "active" : "")"
                             @onclick="() => activeTab = AccountTab.Shorts">
                         Shorts
                     </button>
                 </li>
 
                 <li class="nav-item">
-                    <button class="nav-link @(activeTab == AccountTab.AccountInfo ? "active" : "")"
+                    <button class="nav-link color-primary @(activeTab == AccountTab.AccountInfo ? "active" : "")"
                             @onclick="() => activeTab = AccountTab.AccountInfo">
                         Account info
                     </button>
