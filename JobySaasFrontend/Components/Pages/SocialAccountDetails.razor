@@ -4,6 +4,7 @@
 @using JobySaasFrontend.Services
 @using JobySaasFrontend.Models.DTO
 @inject ISocialAccountApiClient SocialAccountApi
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <div class="container">
     @if (isLoading)
@@ -76,7 +77,8 @@
         @if (activeTab == AccountTab.Overview)
         {
             <AccountOverview analytics="analytics" isAnalyticsLoading="isAnalyticsLoading"
-                             IsRecentVideosLoading="IsRecentVideosLoading" />
+                             IsRecentVideosLoading="IsRecentVideosLoading" IsChartLoading="isChartLoading"
+                             OnRangeChanged="HandleRangeChanged" />
         }
         @if (activeTab == AccountTab.Videos)
         {
@@ -110,7 +112,6 @@
         //idk
     }
 </div>
-
 @code {
     [Parameter]
     public Guid organizationId { get; set; }
@@ -126,10 +127,13 @@
 
     private bool isLoading = true;
     private bool isAnalyticsLoading = true;
+    private bool isChartLoading;
     private bool IsRecentVideosLoading = true;
     private bool isVideosLoading = true;
     private bool isShortsLoading = true;
     private bool isAccountInfoLoading = true;
+
+    private CancellationTokenSource? _analyticsCts;
 
     private AccountTab activeTab = AccountTab.Overview;
 
@@ -144,31 +148,80 @@
     protected override async Task OnInitializedAsync()
     {
         var result = await SocialAccountApi.GetAccountDetailsAsync(organizationId, accountId);
-        var analyticsTask = LoadAnalytics();
 
         if (result.Success)
             details = result.Data;
         else
         {
         }
-        await Task.WhenAll(analyticsTask);
+
+        // Unblock the page as soon as the header/banner/tabs data is in -
+        // don't wait on analytics, recent videos, etc.
         isLoading = false;
 
-    }
-
-    private async Task LoadAnalytics()
-    {
+        // Fire-and-forget: this updates its own loading flags and calls
+        // StateHasChanged() when it resolves, so the Overview tab's chart
+        // section pops in on its own instead of blocking first paint.
         var endDate = DateOnly.FromDateTime(DateTime.UtcNow);
         var startDate = endDate.AddDays(-30);
+        _ = LoadAnalyticsAsync(startDate, endDate);
+    }
 
-        var result = await SocialAccountApi.GetAccountPerformanceAsync(organizationId, accountId, startDate, endDate,
-CancellationToken.None);
+    /// Called by AccountOverview whenever the user picks a new preset or
+    /// custom time range.
+    private async Task HandleRangeChanged((DateOnly Start, DateOnly End) range)
+    {
+        await LoadAnalyticsAsync(range.Start, range.End, isInitialLoad: false);
+    }
 
-        if (result.Success)
-            analytics = result.Data;
+    private async Task LoadAnalyticsAsync(DateOnly startDate, DateOnly endDate, bool isInitialLoad = true)
+    {
+        // Cancel any in-flight request for a previous range so a slow older
+        // response can't overwrite a newer one if the user switches fast.
+        _analyticsCts?.Cancel();
+        _analyticsCts = new CancellationTokenSource();
+        var token = _analyticsCts.Token;
+
+        if (isInitialLoad)
+            isAnalyticsLoading = true;
         else
+            isChartLoading = true;
+
+        await InvokeAsync(StateHasChanged);
+
+        try
         {
+            var result = await SocialAccountApi.GetAccountPerformanceAsync(
+                organizationId, accountId, startDate, endDate, token);
+
+            if (token.IsCancellationRequested)
+                return;
+
+            if (result.Success)
+                analytics = result.Data;
+            else
+            {
+            }
         }
-        isAnalyticsLoading = false;
+        catch (OperationCanceledException)
+        {
+            // Superseded by a newer range selection - ignore.
+            return;
+        }
+        catch (Exception)
+        {
+            // TODO: surface an error state to the user (e.g. a toast) -
+            // swallowing here at minimum keeps a background failure from
+            // crashing the circuit.
+        }
+        finally
+        {
+            if (!token.IsCancellationRequested)
+            {
+                isAnalyticsLoading = false;
+                isChartLoading = false;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
     }
 }

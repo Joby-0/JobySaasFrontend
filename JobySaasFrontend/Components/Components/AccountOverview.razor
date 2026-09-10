@@ -1,8 +1,29 @@
 @using BlazorBootstrap
 @using JobySaasFrontend.Models.DTO
+
 <div class="analytics my-5">
 
-                
+    <div class="d-flex flex-wrap justify-content-start align-items-center gap-2 mb-3">
+        <select class="form-select form-select-sm w-auto" @bind="SelectedRange" @bind:after="OnRangeSelectChangedAsync">
+            <option value="1d">1 Day</option>
+            <option value="30d">30 Days</option>
+            <option value="3m">3 Months</option>
+            <option value="1y">1 Year</option>
+            <option value="3y">3 Years</option>
+            <option value="5y">5 Years</option>
+            <option value="custom">Custom</option>
+        </select>
+
+        @if (SelectedRange == "custom")
+        {
+            <input type="date" class="form-control form-control-sm w-auto" @bind="CustomStart"
+                   @bind:after="OnCustomRangeChangedAsync" />
+            <span class="align-self-center">to</span>
+            <input type="date" class="form-control form-control-sm w-auto" @bind="CustomEnd"
+                   @bind:after="OnCustomRangeChangedAsync" />
+        }
+    </div>
+
     @if (isAnalyticsLoading)
     {
         <div class="row g-3" style="height:360px;">
@@ -41,25 +62,29 @@
     }
     else
     {
-        <div class="row g-3" style="height:360px;">
+        <div class="row g-3" style="height: 400px;">
             <div class="col-8 h-100">
                 @* Analytics chart *@
+                <MetricsLineChart Data="analytics" IsLoading="IsChartLoading" />
             </div>
 
             <div class="col-4 h-100">
                 <div class="d-flex flex-column gap-3 h-100">
-
-                    <div class="flex-grow-1">
+                    <div class="flex-grow-1 border rounded-4 d-flex flex-column align-items-center justify-content-center text-center p-3">
                         @* Analytics card *@
+                        <span class="fs-1 fw-bold color-primary">idk</span>
+                        <span class="small text-muted">yet</span>
                     </div>
 
                     <div class="d-flex gap-3 flex-grow-1">
-                        <div class="flex-grow-1">
-                            @* Analytics card *@
+                        <div class="flex-grow-1 border rounded-4 d-flex flex-column align-items-center justify-content-center text-center p-3">
+                            <span class="fs-1 fw-bold color-secondary">+@TotalSubscribersGained.ToString("N0")</span>
+                            <span class="small text-muted">Subscribers</span>
                         </div>
 
-                        <div class="flex-grow-1">
-                            @* Analytics card *@
+                        <div class="flex-grow-1 border rounded-4 d-flex flex-column align-items-center justify-content-center text-center p-3">
+                            <span class="fs-1 fw-bold watch-time-text color-primary">@WatchTimeDisplay</span>
+                            <span class="small text-muted">Watch time</span>
                         </div>
                     </div>
 
@@ -79,9 +104,11 @@
 
                 <div class="d-flex flex-column gap-2 flex-grow-1">
 
-                    <Placeholder Animation="PlaceholderAnimation.Glow" Size="PlaceholderSize.Large" Width="PlaceholderWidth.Col7" />
+                    <Placeholder Animation="PlaceholderAnimation.Glow" Size="PlaceholderSize.Large"
+                                 Width="PlaceholderWidth.Col7" />
 
-                    <Placeholder Animation="PlaceholderAnimation.Glow" Size="PlaceholderSize.Small" Width="PlaceholderWidth.Col4" />
+                    <Placeholder Animation="PlaceholderAnimation.Glow" Size="PlaceholderSize.Small"
+                                 Width="PlaceholderWidth.Col4" />
 
                 </div>
             </div>
@@ -103,5 +130,74 @@ else
     public bool IsRecentVideosLoading { get; set; }
 
     [Parameter]
-    public List<DailyMetricDto>? analytics {get; set;}
+    public List<DailyMetricDto>? analytics { get; set; }
+
+    /// True while a new range is being fetched — only spinners the chart.
+    [Parameter]
+    public bool IsChartLoading { get; set; }
+
+    /// Bubbled up to SocialAccountDetails, which owns the API call.
+    [Parameter]
+    public EventCallback<(DateOnly Start, DateOnly End)> OnRangeChanged { get; set; }
+
+    private string SelectedRange = "30d";
+    private DateOnly CustomStart = DateOnly.FromDateTime(DateTime.Today.AddDays(-30));
+    private DateOnly CustomEnd = DateOnly.FromDateTime(DateTime.Today);
+
+    private long TotalSubscribersGained => analytics?.Sum(a => a.SubscribersGained) ?? 0;
+
+    private long TotalWatchTimeMinutes => analytics?.Sum(a => a.WatchTimeMinutes) ?? 0;
+
+    private string WatchTimeDisplay
+    {
+        get
+        {
+            var hours = TotalWatchTimeMinutes / 60.0;
+            return hours >= 1 ? $"{hours:N1}h" : $"{TotalWatchTimeMinutes}m";
+        }
+    }
+
+    private async Task OnRangeSelectChangedAsync()
+    {
+        if (SelectedRange == "custom")
+        {
+            // Wait until both custom dates are actually picked.
+            return;
+        }
+
+        var (start, end) = GetPresetRange(SelectedRange);
+        await NotifyRangeChangedAsync(start, end);
+    }
+
+    private async Task OnCustomRangeChangedAsync()
+    {
+        if (SelectedRange != "custom") return;
+        if (CustomStart > CustomEnd) return; // ignore an invalid partial range
+
+        await NotifyRangeChangedAsync(CustomStart, CustomEnd);
+    }
+
+    private async Task NotifyRangeChangedAsync(DateOnly start, DateOnly end)
+    {
+        if (OnRangeChanged.HasDelegate)
+        {
+            await OnRangeChanged.InvokeAsync((start, end));
+        }
+    }
+
+    private static (DateOnly Start, DateOnly End) GetPresetRange(string range)
+    {
+        var today = DateOnly.FromDateTime(DateTime.Today);
+
+        return range switch
+        {
+            "1d" => (today.AddDays(-1), today),
+            "30d" => (today.AddDays(-30), today),
+            "3m" => (today.AddMonths(-3), today),
+            "1y" => (today.AddYears(-1), today),
+            "3y" => (today.AddYears(-3), today),
+            "5y" => (today.AddYears(-5), today),
+            _ => (today.AddDays(-30), today)
+        };
+    }
 }
