@@ -53,4 +53,25 @@ public class SocialAccountApiClient : ISocialAccountApiClient
 
         return result ?? ServiceResult<List<DailyMetricDto>>.Fail("Empty response.");
     }
+
+    public async Task<ServiceResult<PagedResult<RecentVideoDto>>> GetAccountVideosAsync(Guid orgId, Guid accountId, int pageNumber, int pageSize, string order, CancellationToken ct)
+    {
+        var query = new Dictionary<string, string?>
+        {
+            ["accountId"] = accountId.ToString(),
+            ["pageNumber"] = pageNumber.ToString(),
+            ["pageSize"] = pageSize.ToString(),
+            ["order"] = order
+        };
+
+        var url = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(
+            $"api/SocialAccount/{orgId}/videos",
+            query);
+
+        var response = await _http.GetAsync(url, ct);
+
+        var result = await response.Content.ReadFromJsonAsync<ServiceResult<PagedResult<RecentVideoDto>>>(cancellationToken: ct);
+
+        return result ?? ServiceResult<PagedResult<RecentVideoDto>>.Fail("Empty response.");
+    }
 }

@@ -77,7 +77,7 @@
         @if (activeTab == AccountTab.Overview)
         {
             <AccountOverview analytics="analytics" isAnalyticsLoading="isAnalyticsLoading"
-                             IsRecentVideosLoading="IsRecentVideosLoading" IsChartLoading="isChartLoading"
+                             IsRecentVideosLoading="IsRecentVideosLoading" IsChartLoading="isChartLoading" recentVideos="recentVideos"
                              OnRangeChanged="HandleRangeChanged" />
         }
         @if (activeTab == AccountTab.Videos)
@@ -121,8 +121,8 @@
 
     private SocialAccountDetailsDto? details;
     private List<DailyMetricDto>? analytics;
-    @* private List<VideoDto>? videos;
-    private List<ShortDto>? shorts;
+     private List<RecentVideoDto>? recentVideos;
+    @*private List<ShortDto>? shorts;
     private AccountInfoDto? accountInfo;  *@
 
     private bool isLoading = true;
@@ -155,20 +155,16 @@
         {
         }
 
-        // Unblock the page as soon as the header/banner/tabs data is in -
-        // don't wait on analytics, recent videos, etc.
+
         isLoading = false;
 
-        // Fire-and-forget: this updates its own loading flags and calls
-        // StateHasChanged() when it resolves, so the Overview tab's chart
-        // section pops in on its own instead of blocking first paint.
+       
         var endDate = DateOnly.FromDateTime(DateTime.UtcNow);
         var startDate = endDate.AddDays(-30);
         _ = LoadAnalyticsAsync(startDate, endDate);
+        _ = LoadRecentVideosAsync();
     }
 
-    /// Called by AccountOverview whenever the user picks a new preset or
-    /// custom time range.
     private async Task HandleRangeChanged((DateOnly Start, DateOnly End) range)
     {
         await LoadAnalyticsAsync(range.Start, range.End, isInitialLoad: false);
@@ -176,8 +172,6 @@
 
     private async Task LoadAnalyticsAsync(DateOnly startDate, DateOnly endDate, bool isInitialLoad = true)
     {
-        // Cancel any in-flight request for a previous range so a slow older
-        // response can't overwrite a newer one if the user switches fast.
         _analyticsCts?.Cancel();
         _analyticsCts = new CancellationTokenSource();
         var token = _analyticsCts.Token;
@@ -205,14 +199,13 @@
         }
         catch (OperationCanceledException)
         {
-            // Superseded by a newer range selection - ignore.
+
             return;
         }
         catch (Exception)
         {
             // TODO: surface an error state to the user (e.g. a toast) -
-            // swallowing here at minimum keeps a background failure from
-            // crashing the circuit.
+
         }
         finally
         {
@@ -223,5 +216,20 @@
                 await InvokeAsync(StateHasChanged);
             }
         }
+    }
+
+    private async Task LoadRecentVideosAsync()
+    {
+        var result = await SocialAccountApi.GetAccountVideosAsync(organizationId,accountId, pageNumber: 1, pageSize: 10, order: "recent", CancellationToken.None);
+
+        if (result.Success)
+        {
+            recentVideos = result.Data?.Items ?? [];
+        }else{
+
+        }
+        IsRecentVideosLoading = false;
+        await InvokeAsync(StateHasChanged);
+
     }
 }

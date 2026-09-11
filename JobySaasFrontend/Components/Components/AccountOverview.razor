@@ -98,7 +98,7 @@
 </div>
 
 <h2>Recent videos</h2>
-@if (!IsRecentVideosLoading)
+@if (IsRecentVideosLoading)
 {
     <div class="recent-videos border-top pt-3">
         @for (int i = 0; i < 4; i++)
@@ -123,60 +123,61 @@
 else
 {
     <div class="recent-videos border-top pt-3">
+        @foreach (var video in recentVideos)
+        {
+            <div class="d-flex gap-3 border rounded-4 p-3 mb-3">
 
-        <div class="d-flex gap-3 border rounded-4 p-3 mb-3">
-
-            <!-- Thumbnail -->
-            <div class="flex-shrink-0">
-                @* <Image class="rounded-3 object-fit-cover" Src="@video.ThumbnailUrl" Alt="@video.Title"
-                       Style="width: 160px; height: 90px;" /> *@
-            </div>
-
-            <!-- Content -->
-            <div class="d-flex flex-column flex-grow-1 min-w-0">
-
-                <!-- Title -->
-                <div class="fw-semibold text-truncate">
-                    @* @video.Title  *@
+                <!-- Thumbnail -->
+                <div class="flex-shrink-0">
+                    <Image class="rounded-3 object-fit-cover" Src="@video.ThumbnailUrl" Alt="@video.Title" Style="width: 160px; height: 90px;" />
                 </div>
 
-                <!-- Description -->
-                <div class="small text-muted text-truncate">
-                    @* @video.Description *@
+                <!-- Content -->
+                <div class="d-flex flex-column flex-grow-1 min-w-0">
+
+                    <!-- Title -->
+                    <div class="fw-semibold text-truncate">
+                        @video.Title
+                    </div>
+
+                    <!-- Description -->
+                    <div class="small text-muted text-truncate">
+                        @video.Description
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="d-flex align-items-center gap-3 mt-auto pt-2 small text-muted">
+
+                        <span class="d-flex align-items-center gap-1">
+                            <Icon Name="IconName.Eye" />
+                            @video.Views.ToString("N0")
+                        </span>
+
+                        <span class="d-flex align-items-center gap-1">
+                            <Icon Name="IconName.Heart" />
+                            @video.Likes.ToString("N0")
+                        </span>
+
+                        <span class="d-flex align-items-center gap-1">
+                            <Icon Name="IconName.Chat" />
+                            @video.Comments.ToString("N0")
+                        </span>
+
+                        <span class="ms-auto">
+                            @video.PublishedAt.ToString("dd MMM yyyy")
+                        </span>
+
+                    </div>
+
                 </div>
 
-                <!-- Stats -->
-                <div class="d-flex align-items-center gap-3 mt-auto pt-2 small text-muted">
-
-                    <span class="d-flex align-items-center gap-1">
-                        <Icon Name="IconName.Eye" />
-                        @* @video.Views.ToString("N0") *@
-                    </span>
-
-                    <span class="d-flex align-items-center gap-1">
-                        <Icon Name="IconName.Heart" />
-                        @* @video.Likes.ToString("N0") *@
-                    </span>
-
-                    <span class="d-flex align-items-center gap-1">
-                        <Icon Name="IconName.Chat" />
-                        @* @video.Comments.ToString("N0") *@
-                    </span>
-
-                    <span class="ms-auto">
-                        @* @video.PublishedAt.ToString("dd MMM yyyy") *@
-                    </span>
-
+                <!-- Arrow / action -->
+                <div class="d-flex align-items-center">
+                    <Icon Name="IconName.ChevronRight" />
                 </div>
 
             </div>
-
-            <!-- Arrow / action -->
-            <div class="d-flex align-items-center">
-                <Icon Name="IconName.ChevronRight" />
-            </div>
-
-        </div>
+        }
     </div>
 }
 
@@ -189,6 +190,9 @@ else
 
     [Parameter]
     public List<DailyMetricDto>? analytics { get; set; }
+
+    [Parameter]
+    public List<RecentVideoDto>? recentVideos { get; set; }
 
     /// True while a new range is being fetched — only spinners the chart.
     [Parameter]
