@@ -52,6 +52,7 @@ public class RecentVideoDto
     public ulong Comments { get; set; }
 
     public string Duration { get; set; }
+    public string PrivacyStatus { get; set; }
 }
 
 public enum SocialAccountStatus

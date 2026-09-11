@@ -1,0 +1,78 @@
+@using BlazorBootstrap
+@using JobySaasFrontend.Models.DTO
+<div class="d-flex gap-3 border rounded-4 p-3 mb-3">
+
+    <!-- Thumbnail -->
+    <div class="flex-shrink-0">
+        <Image class="rounded-3 object-fit-cover" Src="@video.ThumbnailUrl" Alt="@video.Title"
+               Style="width: 160px; height: 90px;" />
+    </div>
+
+    <!-- Content -->
+    <div class="d-flex flex-column flex-grow-1 min-w-0">
+
+        <!-- Title -->
+        <div class="fw-semibold text-truncate d-flex align-items-center">
+            @video.Title
+            @if (video.PrivacyStatus == "private")
+            {
+                <span class="badge ms-2 bg-secondary">
+                    Private
+                </span>
+            }
+            else if (video.PrivacyStatus == "unlisted")
+            {
+                <span class="badge ms-2 bg-secondary text-dark">
+                    Unlisted
+                </span>
+            }
+            else
+            {
+                <span class="badge ms-2 bg-third">
+                    Public
+                </span>
+            }
+        </div>
+
+        <!-- Description -->
+        <div class="small text-muted text-truncate">
+            @(video.Description.Length > 100 ? video.Description[..100] + "..." : video.Description)
+        </div>
+
+        <!-- Stats -->
+        <div class="d-flex align-items-center gap-3 mt-auto pt-2 small text-muted">
+
+            <span class="d-flex align-items-center gap-1">
+                <Icon Name="IconName.Eye" />
+                @video.Views.ToString("N0")
+            </span>
+
+            <span class="d-flex align-items-center gap-1">
+                <Icon Name="IconName.Heart" />
+                @video.Likes.ToString("N0")
+            </span>
+
+            <span class="d-flex align-items-center gap-1">
+                <Icon Name="IconName.Chat" />
+                @video.Comments.ToString("N0")
+            </span>
+
+            <span class="ms-auto">
+                @video.PublishedAt.ToString("dd MMM yyyy")
+            </span>
+
+        </div>
+
+    </div>
+
+    <!-- Arrow / action -->
+    <div class="d-flex align-items-center">
+        <Icon Name="IconName.ChevronRight" />
+    </div>
+
+</div>
+
+@code {
+    [Parameter]
+    public RecentVideoDto video { get; set; }
+}
