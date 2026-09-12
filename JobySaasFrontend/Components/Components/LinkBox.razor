@@ -1,9 +1,14 @@
+```razor
 @using BlazorBootstrap
 
-<NavLink href="@Href" class="text-decoration-none ">
-    <div class="link-box p-3 rounded-3 position-relative d-flex @Class" style="width: @Width; height: @Height; background-color: @BackgroundColor;">
+@if (OnClick.HasDelegate)
+{
+    <button type="button"
+            class="link-box p-3 rounded-3 position-relative d-flex @Class"
+            style="width: @Width; height: @Height; background-color: @BackgroundColor;"
+            @onclick="OnClick">
 
-        <div class="link-box-content">
+        <div class="link-box-content w-100">
 
             <div class="link-box-icon end-0 position-absolute top-0 p-2">
                 <Icon Name="@Icon" Color="@IconColor" />
@@ -11,22 +16,57 @@
 
             <span class="link-box-text start-0 position-absolute bottom-0 p-2 fw-semibold d-flex">
                 @Text
-                
             </span>
 
         </div>
-    </div>
-</NavLink>
+
+    </button>
+}
+else
+{
+    <NavLink href="@Href" class="text-decoration-none">
+
+        <div class="link-box p-3 rounded-3 position-relative d-flex @Class"
+             style="width: @Width; height: @Height; background-color: @BackgroundColor;">
+
+            <div class="link-box-content w-100">
+
+                <div class="link-box-icon end-0 position-absolute top-0 p-2">
+                    <Icon Name="@Icon" Color="@IconColor" />
+                </div>
+
+                <span class="link-box-text start-0 position-absolute bottom-0 p-2 fw-semibold d-flex">
+                    @Text
+                </span>
+
+            </div>
+
+        </div>
+
+    </NavLink>
+}
 
 @code {
     [Parameter] public string Text { get; set; } = "";
     [Parameter] public string Href { get; set; } = "#";
     [Parameter] public IconName Icon { get; set; }
-    
+
     [Parameter] public string Width { get; set; } = "150px";
     [Parameter] public string Height { get; set; } = "100px";
-    [Parameter] public string BackgroundColor { get; set; } = "none";    
-    [Parameter] public IconColor IconColor { get; set; } = IconColor.Secondary;
+    [Parameter] public string BackgroundColor { get; set; } = "none";
 
+    [Parameter] public IconColor IconColor { get; set; } = IconColor.Secondary;
     [Parameter] public string Class { get; set; } = "";
+
+    [Parameter] public EventCallback OnClick { get; set; }
+}
+.link-box {
+    border: none;
+    color: inherit;
+    text-align: inherit;
+    cursor: pointer;
+}
+
+.link-box:hover {
+    color: inherit;
 }

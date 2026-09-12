@@ -59,7 +59,7 @@
         {
             <div>
                 <button class="btn btn-sm p-0 mb-3" @onclick="ResetInviteType">
-                     Back
+                    Back
                 </button>
 
                 <div class="mb-3">
@@ -168,5 +168,9 @@
         isPrivateInvite = false;
 
         // Close modal
+    }
+    public async Task ShowAsync()
+    {
+        await inviteModal.ShowAsync();
     }
 }
