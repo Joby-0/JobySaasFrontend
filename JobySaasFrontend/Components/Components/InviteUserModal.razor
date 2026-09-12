@@ -14,8 +14,7 @@
                     Choose how you want to invite someone.
                 </p>
 
-                <button class="invite-option w-100 text-start mb-3"
-                        @onclick="() => SelectInviteType(true)">
+                <button class="invite-option w-100 text-start mb-3" @onclick="() => SelectInviteType(true)">
 
                     <div class="d-flex align-items-center gap-3">
                         <div class="invite-icon">
@@ -35,8 +34,7 @@
 
                 </button>
 
-                <button class="invite-option w-100 text-start"
-                        @onclick="() => SelectInviteType(false)">
+                <button class="invite-option w-100 text-start" @onclick="() => SelectInviteType(false)">
 
                     <div class="d-flex align-items-center gap-3">
                         <div class="invite-icon">
@@ -60,9 +58,8 @@
         else if (isPrivateInvite)
         {
             <div>
-                <button class="btn btn-sm p-0 mb-3"
-                        @onclick="ResetInviteType">
-                    ← Back
+                <button class="btn btn-sm p-0 mb-3" @onclick="ResetInviteType">
+                     Back
                 </button>
 
                 <div class="mb-3">
@@ -70,51 +67,23 @@
                         Email
                     </label>
 
-                    <InputText class="form-control"
-                               @bind-Value="email"
-                               placeholder="name@example.com" />
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">
-                        Role
-                    </label>
-
-                    <select class="form-select"
-                            @bind="role">
-                        <option value="Member">Member</option>
-                        <option value="Admin">Admin</option>
-                    </select>
+                    <InputText class="form-control" @bind-Value="email" placeholder="name@example.com" />
                 </div>
             </div>
         }
         else
         {
             <div>
-                <button class="btn btn-sm p-0 mb-3"
-                        @onclick="ResetInviteType">
-                    ← Back
+                <button class="btn btn-sm p-0 mb-3" @onclick="ResetInviteType">
+                    Back
                 </button>
-
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">
-                        Role
-                    </label>
-
-                    <select class="form-select"
-                            @bind="role">
-                        <option value="Member">Member</option>
-                        <option value="Admin">Admin</option>
-                    </select>
-                </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">
                         Expires after
                     </label>
 
-                    <select class="form-select"
-                            @bind="expirationDays">
+                    <select class="form-select" @bind="expirationDays">
                         <option value="1">1 day</option>
                         <option value="7">7 days</option>
                         <option value="14">14 days</option>
@@ -130,30 +99,26 @@
 
         @if (inviteTypeSelected)
         {
-            <button class="btn btn-secondary"
-                    @onclick="ResetInviteType">
+            <button class="btn btn-secondary" @onclick="ResetInviteType">
                 Back
             </button>
 
             @if (isPrivateInvite)
             {
-                <button class="btn btn-primary"
-                        @onclick="SendPrivateInvite">
+                <button class="btn btn-primary" @onclick="SendPrivateInvite">
                     Send invite
                 </button>
             }
             else
             {
-                <button class="btn btn-primary"
-                        @onclick="CreatePublicInvite">
+                <button class="btn btn-primary" @onclick="CreatePublicInvite">
                     Create invite link
                 </button>
             }
         }
         else
         {
-            <button class="btn btn-secondary"
-                    @onclick="CloseInviteModal">
+            <button class="btn btn-secondary" @onclick="CloseInviteModal">
                 Cancel
             </button>
         }
@@ -173,7 +138,6 @@
     private Modal inviteModal = new Modal();
 
     private string email = "";
-    private string role = "Member";
     private int expirationDays = 7;
 
     private void SelectInviteType(bool privateInvite)
