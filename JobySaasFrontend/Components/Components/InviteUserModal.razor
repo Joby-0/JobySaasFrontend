@@ -1,0 +1,15 @@
+@using BlazorBootstrap
+<Modal>
+    <HeaderTemplate></HeaderTemplate>
+    <BodyTemplate></BodyTemplate>
+    <FooterTemplate></FooterTemplate>
+</Modal>
+
+@code{
+    [Parameter]
+    public Guid organizationId {get; set;}
+
+    private bool isPrivateInvite = false;
+
+    
+}
