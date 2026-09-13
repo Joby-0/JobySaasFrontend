@@ -21,9 +21,9 @@ public class InvitationApiClient : IInvitationApiClient
         return result ?? ServiceResult<bool>.Fail("Empty response from API.");
     }
 
-    public async Task<ServiceResult<string>> CreateInviteCodeAsync(Guid organizationId, int expireInMinutes)
+    public async Task<ServiceResult<string>> CreateInviteCodeAsync(Guid organizationId, int expireInMinutes, string? email)
     {
-        var response = await _http.PostAsync($"api/Invitation/createinvitecode/{organizationId}?expireInMinutes={expireInMinutes}", null);
+        var response = await _http.PostAsync($"api/Invitation/createinvitecode/{organizationId}?expireInMinutes={expireInMinutes}?email{email}", null);
 
         var result = await response.Content.ReadFromJsonAsync<ServiceResult<string>>();
 

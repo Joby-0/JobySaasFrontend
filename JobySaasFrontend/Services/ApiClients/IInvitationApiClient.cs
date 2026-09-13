@@ -5,7 +5,7 @@ namespace JobySaasFrontend.Services;
 
 public interface IInvitationApiClient
 {
-    Task<ServiceResult<string>> CreateInviteCodeAsync(Guid organizationId, int expireInMinutes);
+    Task<ServiceResult<string>> CreateInviteCodeAsync(Guid organizationId, int expireInMinutes, string? email);
     Task<ServiceResult<InvitationPreviewDto>> GetInvitePreviewAsync(string code);
     Task<ServiceResult<bool>> AcceptInviteAsync(string code);
 }
