@@ -1,4 +1,6 @@
 @using BlazorBootstrap
+@using JobySaasFrontend.Services
+@inject IInvitationApiClient invitationApiClient
 <Modal @ref="inviteModal">
 
     <HeaderTemplate>
@@ -83,11 +85,11 @@
                         Expires after
                     </label>
 
-                    <select class="form-select" @bind="expirationDays">
-                        <option value="1">1 day</option>
-                        <option value="7">7 days</option>
-                        <option value="14">14 days</option>
-                        <option value="30">30 days</option>
+                    <select class="form-select" @bind="expirationInMinutes">
+                        <option value="5">5 minutes</option>
+                        <option value="60">15 minutes</option>
+                        <option value="60">1 hour</option>
+                        <option value="1440">1 Day days</option>
                     </select>
                 </div>
             </div>
@@ -138,7 +140,7 @@
     private Modal inviteModal = new Modal();
 
     private string email = "";
-    private int expirationDays = 7;
+    private int expirationInMinutes = 7;
 
     private void SelectInviteType(bool privateInvite)
     {
@@ -155,11 +157,14 @@
     private async Task SendPrivateInvite()
     {
         // Call API
+        await invitationApiClient.CreateInviteCodeAsync(organizationId, expirationInMinutes, email);
     }
 
     private async Task CreatePublicInvite()
     {
         // Call API
+        await invitationApiClient.CreateInviteCodeAsync(organizationId, expirationInMinutes,null);
+
     }
 
     private async Task CloseInviteModal()
