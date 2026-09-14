@@ -1,6 +1,8 @@
 @using BlazorBootstrap
+@using JobySaasFrontend.Models
 @using JobySaasFrontend.Services
 @inject IInvitationApiClient invitationApiClient
+@inject EmailSender sender
 <Modal @ref="inviteModal">
 
     <HeaderTemplate>
@@ -89,7 +91,7 @@
                         <option value="5">5 minutes</option>
                         <option value="60">15 minutes</option>
                         <option value="60">1 hour</option>
-                        <option value="1440">1 Day days</option>
+                        <option value="1440">1 day</option>
                     </select>
                 </div>
             </div>
@@ -157,14 +159,31 @@
     private async Task SendPrivateInvite()
     {
         // Call API
-        await invitationApiClient.CreateInviteCodeAsync(organizationId, expirationInMinutes, email);
+        var result = await CreateInvite();
+        if(!result.Success){
+
+        }
+        else{
+            await sender.SendInvitationAsync(result.Data,email);
+        }
     }
 
     private async Task CreatePublicInvite()
     {
         // Call API
-        await invitationApiClient.CreateInviteCodeAsync(organizationId, expirationInMinutes,null);
+        var result = await CreateInvite();
+        if(!result.Success){
 
+        }
+        else{
+
+        }
+
+    }
+    private async Task<ServiceResult<string>> CreateInvite()
+    {
+        var result = await invitationApiClient.CreateInviteCodeAsync(organizationId, expirationInMinutes, email);
+        return result;
     }
 
     private async Task CloseInviteModal()

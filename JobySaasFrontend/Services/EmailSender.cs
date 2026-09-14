@@ -239,4 +239,31 @@ public class EmailSender : IEmailSender<ApplicationUser>
     {
         throw new NotImplementedException();
     }
+
+    public async Task SendInvitationAsync(string code, string email)
+    {
+        var message = new EmailMessage
+        {
+            From = "Joby <onboarding@resend.dev>",
+            To = email,
+            Subject = "You're invited to join Joby",
+            HtmlBody = $"""
+                <h2>You're invited!</h2>
+
+                <p>You have been invited to join Joby.</p>
+
+                <p>Your invitation code is:</p>
+
+                <h1>{code}</h1>
+
+                <p>Use this code when joining the organization.</p>
+
+                <p>If you did not expect this invitation, you can safely ignore this email.</p>
+
+                <p>Best regards,<br/>The Joby Team</p>
+                """
+        };
+
+        await _resend.EmailSendAsync(message);
+    }
 }
