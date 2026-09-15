@@ -59,7 +59,7 @@
             {
                 <LinkBox BackgroundColor="none" Class="border" Text="Plan"
                          Href="@($"/org/{OrganizationState.CurrentOrganization.Id}/manage-plan")" Icon="IconName.BoxArrowUpRight" />
-                <LinkBox BackgroundColor="none" Class="border" Text="Invite Members" Href="@($"/org/{organizationId}/invite")"
+                <LinkBox BackgroundColor="none" Class="border" OnClick="ShowInviteModal" Text="Invite Members" 
                          Icon="IconName.BoxArrowUpRight" />
             }
 
