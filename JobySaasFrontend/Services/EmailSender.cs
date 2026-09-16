@@ -2,7 +2,12 @@ using JobySaasFrontend.Data;
 using Microsoft.AspNetCore.Identity;
 using Resend;
 
-public class EmailSender : IEmailSender<ApplicationUser>
+public interface IEmailService
+{
+    Task SendInvitationAsync(string code, string email);
+}
+
+public class EmailSender : IEmailSender<ApplicationUser>, IEmailService
 {
     private readonly ResendClient _resend;
 

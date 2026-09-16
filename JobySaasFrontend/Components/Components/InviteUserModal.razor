@@ -1,8 +1,10 @@
 @using BlazorBootstrap
+@using JobySaasFrontend.Data
 @using JobySaasFrontend.Models
 @using JobySaasFrontend.Services
+@using Microsoft.AspNetCore.Identity
 @inject IInvitationApiClient invitationApiClient
-@inject EmailSender sender
+@inject IEmailService sender
 <Modal @ref="inviteModal">
 
     <HeaderTemplate>
