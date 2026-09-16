@@ -1,6 +1,6 @@
 @page "/onboarding/review"
 @layout OnboardingLayout;
-
+@rendermode InteractiveServer
 @using JobySaasFrontend.Services;
 @using JobySaasFrontend.Models.DTO;
 @using JobySaasFrontend.Components.Components;
@@ -90,10 +90,10 @@
     protected override void OnInitialized()
     {
         // guard against landing here directly with no prior state
-        if (string.IsNullOrWhiteSpace(State.OrgName) || State.SelectedPlan is null)
+        @* if (string.IsNullOrWhiteSpace(State.OrgName) || State.SelectedPlan is null)
         {
             NavigationManager.NavigateTo("/onboarding/organization");
-        }
+        } *@
     }
     private void GoBack() => NavigationManager.NavigateTo("/onboarding/plan");
 

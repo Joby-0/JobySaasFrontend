@@ -8,7 +8,8 @@
 
     @if (ShowContinue)
     {
-        <button class="btn btn-secondary footer-continue" disabled="@IsContinueDisabled" @onclick="() => OnContinue.InvokeAsync()">
+        <button class="btn btn-secondary footer-continue" disabled="@IsContinueDisabled"
+                @onclick="() => OnContinue.InvokeAsync()">
             @if (IsSubmitting)
             {
                 <span class="spinner-border spinner-border-sm me-2"></span>
@@ -32,4 +33,18 @@
     [Parameter] public string ContinueLabel { get; set; } = "Continue";
     [Parameter] public EventCallback OnBack { get; set; }
     [Parameter] public EventCallback OnContinue { get; set; }
+
+    private async Task HandleBack()
+    {
+        await OnBack.InvokeAsync();
+
+        StateHasChanged();
+    }
+
+    private async Task HandleContinue()
+    {
+        await OnContinue.InvokeAsync();
+
+        StateHasChanged();
+    }
 }

@@ -16,7 +16,8 @@
 
         <div class="mb-3">
             <label class="form-label fw-semibold">Organization name</label>
-            <input class="form-control form-control-lg" @bind="State.OrgName" @bind:event="oninput" placeholder="e.g. Acme Studios" />
+            <input class="form-control form-control-lg" value="@State.OrgName" @oninput="((x)=>OnOrgNameInput(x))"
+                   placeholder="e.g. Acme Studios" />
         </div>
     </div>
 </div>
@@ -24,4 +25,11 @@
 
 @code {
     private void Next() => NavigationManager.NavigateTo("/onboarding/plan");
+
+    private void OnOrgNameInput(ChangeEventArgs e)
+    {
+        State.OrgName = e.Value?.ToString() ?? string.Empty;
+
+        StateHasChanged();
+    }
 }

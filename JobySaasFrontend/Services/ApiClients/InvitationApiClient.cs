@@ -10,7 +10,10 @@ public class InvitationApiClient : IInvitationApiClient
 {
     private readonly HttpClient _http;
 
-    public InvitationApiClient(HttpClient http) => _http = http;
+    public InvitationApiClient(HttpClient http)
+    {
+        _http = http;
+    }
 
     public async Task<ServiceResult<bool>> AcceptInviteAsync(string code)
     {
