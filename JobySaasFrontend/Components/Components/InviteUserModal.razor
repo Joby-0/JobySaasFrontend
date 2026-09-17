@@ -1,10 +1,13 @@
 @using BlazorBootstrap
 @using JobySaasFrontend.Data
 @using JobySaasFrontend.Models
+@using JobySaasFrontend.Models.DTO
 @using JobySaasFrontend.Services
 @using Microsoft.AspNetCore.Identity
 @inject IInvitationApiClient invitationApiClient
 @inject IEmailService sender
+@implements IDisposable
+@inject IJSRuntime JS
 <Modal @ref="inviteModal">
 
     <HeaderTemplate>
@@ -67,6 +70,7 @@
                 <button class="btn btn-sm p-0 mb-3" @onclick="ResetInviteType">
                     Back
                 </button>
+                <span>This invite will be avaible for 24 hours</span>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">
@@ -80,22 +84,68 @@
         else
         {
             <div>
+
                 <button class="btn btn-sm p-0 mb-3" @onclick="ResetInviteType">
                     Back
                 </button>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">
-                        Expires after
-                    </label>
+                
+                @if (invitation is not null)
+                {
+                    <div class="text-center">
 
-                    <select class="form-select" @bind="expirationInMinutes">
-                        <option value="5">5 minutes</option>
-                        <option value="60">15 minutes</option>
-                        <option value="60">1 hour</option>
-                        <option value="1440">1 day</option>
-                    </select>
-                </div>
+                        <div class="invite-code-box position-relative mb-3">
+
+                            <button class="copy-code-btn" title="Copy invite code" @onclick="CopyInviteCode">
+
+                                <i class="bi bi-copy"></i>
+
+                            </button>
+
+                            <span class="invite-code">
+                                @invitation.Code
+                            </span>
+
+                        </div>
+
+                        <div class="text-muted">
+                            @if (remainingTime > TimeSpan.Zero)
+                            {
+                                <span>
+                                    Expires in
+                                    <strong>@FormatRemainingTime()</strong>
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-danger">
+                                    This invite has expired
+                                </span>
+                            }
+                        </div>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+                            Expires after
+                        </label>
+
+                        <select class="form-select" @bind="expirationInMinutes">
+
+                            <option value="5">5 minutes</option>
+                            <option value="15">15 minutes</option>
+                            <option value="60">1 hour</option>
+                            <option value="1440">1 day</option>
+
+                        </select>
+
+                    </div>
+                }
+
             </div>
         }
 
@@ -144,7 +194,14 @@
     private Modal inviteModal = new Modal();
 
     private string email = "";
-    private int expirationInMinutes = 7;
+    private int expirationInMinutes = 1440;
+    private string publicInviteCode = "";
+
+    private TimeSpan remainingTime;
+    private PeriodicTimer? countdownTimer;
+    private CancellationTokenSource? countdownCts;
+
+    private InvitationDto? invitation;
 
     private void SelectInviteType(bool privateInvite)
     {
@@ -160,43 +217,132 @@
 
     private async Task SendPrivateInvite()
     {
-        // Call API
-        var result = await CreateInvite();
-        if(!result.Success){
+        await CreateInvite();
+        if (invitation == null)
+        {
 
         }
-        else{
-            await sender.SendInvitationAsync(result.Data,email);
+        else
+        {
+            await sender.SendInvitationAsync(invitation.Code, email);
+            ResetInviteType();
         }
+    }
+    private string FormatRemainingTime()
+    {
+        if (remainingTime.TotalDays >= 1)
+        {
+            return $"{(int)remainingTime.TotalDays}d " +
+                   $"{remainingTime.Hours:00}:" +
+                   $"{remainingTime.Minutes:00}:" +
+                   $"{remainingTime.Seconds:00}";
+        }
+
+        return $"{remainingTime.Hours:00}:" +
+               $"{remainingTime.Minutes:00}:" +
+               $"{remainingTime.Seconds:00}";
     }
 
     private async Task CreatePublicInvite()
     {
-        // Call API
-        var result = await CreateInvite();
-        if(!result.Success){
+        await CreateInvite();
+        if (invitation == null)
+        {
 
         }
-        else{
+        else
+        {
+            publicInviteCode = invitation.Code;
 
+            await StartCountdown();
+
+            StateHasChanged();
         }
 
     }
-    private async Task<ServiceResult<string>> CreateInvite()
+    private async Task CopyInviteCode()
     {
-        var result = await invitationApiClient.CreateInviteCodeAsync(organizationId, expirationInMinutes, email);
-        return result;
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", publicInviteCode);
+    }
+    private async Task ShareInvite()
+    {
+        await JS.InvokeVoidAsync(
+            "navigator.share",
+            new
+            {
+                title = "JobySaaS invitation",
+                text = $"Use this invite code to join: {publicInviteCode}"
+            });
+    }
+    private async Task CreateInvite()
+    {
+        var result = await invitationApiClient.CreateInviteCodeAsync(
+            organizationId,
+            expirationInMinutes,
+            email);
+
+        if (result.Success)
+        {
+            invitation = result.Data;
+
+            await StartCountdown();
+        }
     }
 
     private async Task CloseInviteModal()
     {
         inviteTypeSelected = false;
         isPrivateInvite = false;
-
+        publicInviteCode = "";
+        Dispose();
         // Close modal
     }
     public async Task ShowAsync()
     {
         await inviteModal.ShowAsync();
+    }
+
+    private async Task StartCountdown()
+    {
+        countdownCts?.Cancel();
+        countdownCts?.Dispose();
+
+        countdownCts = new CancellationTokenSource();
+
+        UpdateRemainingTime();
+
+        countdownTimer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+
+        try
+        {
+            while (await countdownTimer.WaitForNextTickAsync(countdownCts.Token))
+            {
+                UpdateRemainingTime();
+
+                await InvokeAsync(StateHasChanged);
+
+                if (remainingTime <= TimeSpan.Zero)
+                    break;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+    private void UpdateRemainingTime()
+    {
+        if (invitation is null)
+            return;
+
+        remainingTime = invitation.ExpiresAt - DateTime.UtcNow;
+
+        if (remainingTime < TimeSpan.Zero)
+            remainingTime = TimeSpan.Zero;
+    }
+    public void Dispose()
+    {
+        countdownCts?.Cancel();
+        countdownCts?.Dispose();
+        countdownTimer?.Dispose();
     }
 }

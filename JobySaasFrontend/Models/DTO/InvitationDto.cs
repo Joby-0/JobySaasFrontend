@@ -5,3 +5,9 @@ public class InvitationPreviewDto
     public string InvitedByName { get; set; }
     public DateTime ExpiresAt { get; set; }
 }
+
+public class InvitationDto
+{
+    public string Code {get; set;}
+    public DateTime ExpiresAt {get; set;}
+}

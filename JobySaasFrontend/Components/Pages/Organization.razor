@@ -3,6 +3,8 @@
 @using JobySaasFrontend.Components.Components
 @using JobySaasFrontend.Models.DTO
 @using JobySaasFrontend.Services
+@rendermode InteractiveServer
+
 @inject IOrganizationApiClient OrganizationService
 @inject OrganizationStateService OrganizationState
 
@@ -143,6 +145,7 @@
         members = result.Data.ToList();
 
         isMembersLoading = false;
+        StateHasChanged();
         await InvokeAsync(StateHasChanged);
 
     }
