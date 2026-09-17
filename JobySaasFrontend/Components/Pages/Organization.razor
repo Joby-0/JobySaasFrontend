@@ -8,8 +8,13 @@
 @inject IOrganizationApiClient OrganizationService
 @inject OrganizationStateService OrganizationState
 
+@inject ToastService ToastService
+
+
 <div class="container">
-    <InviteUserModal @ref="inviteUserModal" organizationId="organizationId" />
+    <Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
+
+    <InviteUserModal @ref="inviteUserModal" OnError="HandleInviteError" organizationId="organizationId" />
     @if (isLoading)
     {
         <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
@@ -61,7 +66,7 @@
             {
                 <LinkBox BackgroundColor="none" Class="border" Text="Plan"
                          Href="@($"/org/{OrganizationState.CurrentOrganization.Id}/manage-plan")" Icon="IconName.BoxArrowUpRight" />
-                <LinkBox BackgroundColor="none" Class="border" OnClick="ShowInviteModal" Text="Invite Members" 
+                <LinkBox BackgroundColor="none" Class="border" OnClick="ShowInviteModal" Text="Invite Members"
                          Icon="IconName.BoxArrowUpRight" />
             }
 
@@ -153,6 +158,13 @@
     private async Task ShowInviteModal()
     {
         await inviteUserModal.ShowAsync();
+    }
+
+    private void HandleInviteError(string errormessage)
+    {
+        var message = new ToastMessage(ToastType.Danger, IconName.ExclamationCircle, "Invitation was not created", errormessage);
+        ToastService.Notify(message);
+        StateHasChanged();
     }
 
 }

@@ -26,10 +26,6 @@
                 <button class="invite-option w-100 text-start mb-3" @onclick="() => SelectInviteType(true)">
 
                     <div class="d-flex align-items-center gap-3">
-                        <div class="invite-icon">
-                            <Icon Name="IconName.Lock" />
-                        </div>
-
                         <div>
                             <div class="fw-semibold">
                                 Private invite
@@ -46,10 +42,6 @@
                 <button class="invite-option w-100 text-start" @onclick="() => SelectInviteType(false)">
 
                     <div class="d-flex align-items-center gap-3">
-                        <div class="invite-icon">
-                            <Icon Name="IconName.Link45Deg" />
-                        </div>
-
                         <div>
                             <div class="fw-semibold">
                                 Public invite
@@ -70,7 +62,7 @@
                 <button class="btn btn-sm p-0 mb-3" @onclick="ResetInviteType">
                     Back
                 </button>
-                <span>This invite will be avaible for 24 hours</span>
+                <p>This invite will be avaible for 24 hours</p>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">
@@ -84,11 +76,6 @@
         else
         {
             <div>
-
-                <button class="btn btn-sm p-0 mb-3" @onclick="ResetInviteType">
-                    Back
-                </button>
-
                 
                 @if (invitation is not null)
                 {
@@ -96,10 +83,10 @@
 
                         <div class="invite-code-box position-relative mb-3">
 
-                            <button class="copy-code-btn" title="Copy invite code" @onclick="CopyInviteCode">
-
-                                <i class="bi bi-copy"></i>
-
+                            <button type="button" class="copy-code-btn" onclick="copyInviteCode(this)" title="Copy invite code">
+                                <Tooltip Title="Copy" Placement="TooltipPlacement.Bottom">
+                                    <i class="bi bi-copy"></i>
+                                </Tooltip>
                             </button>
 
                             <span class="invite-code">
@@ -188,6 +175,9 @@
     [Parameter]
     public Guid organizationId { get; set; }
 
+    [Parameter]
+    public EventCallback<string> OnError {get; set;}
+
     private bool inviteTypeSelected = false;
     private bool isPrivateInvite = false;
 
@@ -195,8 +185,6 @@
 
     private string email = "";
     private int expirationInMinutes = 1440;
-    private string publicInviteCode = "";
-
     private TimeSpan remainingTime;
     private PeriodicTimer? countdownTimer;
     private CancellationTokenSource? countdownCts;
@@ -252,17 +240,11 @@
         }
         else
         {
-            publicInviteCode = invitation.Code;
-
             await StartCountdown();
 
             StateHasChanged();
         }
 
-    }
-    private async Task CopyInviteCode()
-    {
-        await JS.InvokeVoidAsync("navigator.clipboard.writeText", publicInviteCode);
     }
     private async Task ShareInvite()
     {
@@ -271,7 +253,7 @@
             new
             {
                 title = "JobySaaS invitation",
-                text = $"Use this invite code to join: {publicInviteCode}"
+                text = $"Use this invite code to join: {invitation?.Code}"
             });
     }
     private async Task CreateInvite()
@@ -287,15 +269,19 @@
 
             await StartCountdown();
         }
+        else{
+           await OnError.InvokeAsync(result.Error);
+        }
     }
 
     private async Task CloseInviteModal()
     {
         inviteTypeSelected = false;
         isPrivateInvite = false;
-        publicInviteCode = "";
+        invitation = null;
         Dispose();
         // Close modal
+        await inviteModal.HideAsync();
     }
     public async Task ShowAsync()
     {
